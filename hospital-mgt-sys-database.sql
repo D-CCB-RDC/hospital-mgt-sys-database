@@ -270,5 +270,12 @@ create procedure enregistrer level_id
 				insert 
 					(descriptions)
 				values
-					(descriptions)
------------------ici se termine la logique de la table t_level----------------------
+					(@descriptions)
+go
+create procedure supprimer t_level
+	@level_id nvarchar(40)
+	as
+		delete from t_level
+			where level_id like @level_id
+go			
+-----------------ici se termine la logique de la table t_level--------------
