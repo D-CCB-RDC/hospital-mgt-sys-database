@@ -20,7 +20,7 @@ create table t_company
 )
 go
 ---------------------ici commence la logique de la table t_company---------------------------
-create procedure afficher t_company
+create procedure afficher_company
 	as 
 	select top 20
 		company_id as 'company_id',
@@ -33,7 +33,7 @@ create procedure afficher t_company
 	from t_company
 		order by company_id desc
 go
-create procedure rechercher company_name
+create procedure rechercher_company_name
 	@company_name nvarchar(50)
 	as
 	select top 20
@@ -49,7 +49,7 @@ create procedure rechercher company_name
 	   		company_name like '%'+@company_name+%
 		order by company_id desc				
 go
-create procedure enregistrer company_name
+create procedure enregistrer_company_name
 		@company_id nvarchar(50),
 		@company_name nvarchar(50),
 		@logo nvarchar(max),
@@ -75,7 +75,7 @@ create procedure enregistrer company_name
 				values
 					(@company_name, @logo, @adresse, @telephone, @legal_info)
 go
-create procedure supprimer t_company
+create procedure supprimer_company
 	@company_id int
 	as
 		delete from t_company
@@ -99,7 +99,7 @@ create table t_users
 )
 go
 -------------------ici commence la logique du table t_users-----------------
-create procedure afficher t_users
+create procedure afficher_users
 	as
 		select top 20
 			user_id as 'user_id',
@@ -310,7 +310,7 @@ create procedure afficher_patient
 		adress as 'adress',
 		telephone as 'telephone',
 		reference_name 'reference_name',
-		reference_phone as 'reference',
+		reference_telephone as 'reference_telephone',
 		attach_hospital as 'attach_hospital',
 		blood_group  as 'blood_group',
 		access_level as 'access_leve',
@@ -836,7 +836,7 @@ create procedure rechercher_id_departement_test
 			id_departement_tests like '%'+@id_departement_tests+'%'
 		order by id_departement_tests
 go
-create procedure enregistrer_id_departement_tests
+create procedure enregistrer_departement_tests
 	@id_departement_tests nvarchar(50),
 	@descriptions	nvarchar(max)
 	as
@@ -875,7 +875,7 @@ create procedure afficher_test_medicaux
 		from t_test_medicaux
 			order by id_test_medical desc
 go
-create procedure rechercher_id_test_medical
+create procedure rechercher_test_medical
 	@id_test_medical nvarchar(40),
 	as
 		select top 20
@@ -902,20 +902,606 @@ create procedure enregistrer_test_medicaux
 				values
 					(@descriptions)											 	
 go
-create procedure supprimer_prix_test_medicaux
+create procedure supprimer_test_medicaux
 	@id_test_medical
 	as
-		delete from t_prix_test_medicaux
+		delete from t_test_medicaux
 			where id_test_medical like @id_test_medical
 go
 ----------------------------ici se termine la logique de la table t_prix_test_medicaux--------------
+create table t_history_antecedants	
+(
+    id_history_antecedants int identity,
+	patient_id int,
+	antecedants_id int,
+	created_at nvarchar(max),
+	company_id nvarchar(50),
+	access_level nvarchar(40),
+	details nvarchar(max)
+	constraint pk_antecedants primary key (antecedants_id)
+)
+go
+alter table t_history_antecedants add constraint fk_history_antecedants
+	 foreign key (antecedants_id) references t_antecedants(antecedant_id) 
+--------------------ici commence la logique de table t_antecedants--------------------------------
+create procedure afficher_history_antecedants
+	as
+		select top 20
+			id_history_antecedants as 'id_history_antecedants',
+			patient_id as 'patient_id',
+			antecedants_id as 'antecedants_id',
+			patient_id as 'patient_id',
+			created_at as 'created',
+			company_id as 'company_id',
+			access_level as 'access_level',
+			details as 'details'
+		from t_antecedants
+			order by antecedant_id desc
+go
+create procedure rechercher_history_antecedants	
+	@patient_id int	
+	as
+		select top 20
+			id_history_antecedants as 'id_history_antecedants',
+			patient_id as 'patient_id',
+			antecedants_id as 'antecedants_id',
+			patient_id as 'patient_id',
+			created_at as 'created',
+			company_id as 'company_id',
+			access_level as 'access_level',
+			details as 'details'
+        from t_history_antecedants
+			where
+				patient_id like @patient_id
+			order by id_history_antecedants desc
+go
+create procedure enregistrer_history_antecedants	
+	@id_history_antecedants int,
+	@patient_id int,
+	@antecedants_id int,
+	@created_at nvarchar(max),
+	@company_id nvarchar(50),
+	@access_level nvarchar(40),
+	@details nvarchar(max)
+	as
+		merge into t_history_antecedants
+			using(select @id_history_antecedants as x_id) as x_source
+			on(x_source.x_id=t_history_antecedants.id_history_antecedants)
+			when matched then
+				update set
+					patient_id=@patient_id,
+					antecedants_id=@antecedants_id,
+					created_at=@created_at,
+					company_id=@company_id,
+					access_level=@access_level,
+					details=@details
+			when not matched then
+				insert
+					(patient_id, antecedants_id, created_at, company_id, access_level, details)
+				values
+					(@patient_id, @antecedants_id, @created_at, @company_id, @access_level, @details)			
+go
+create procedure supprimer_history_antecedants		
+	@patient_id int
+		as
+			delete from t_history_antecedants
+				where id_history_antecedants like @id_history_antecedants
+go
+----------------------------ici se termine la logique de la table t_history_antecedants---------------------------
+create table t_antecedants
+(
+	antecedants_id int(1.1) not null,
+	descriptions nvarchar(max),
+	status_antecedant boolean
+	constraint pk_antecedants primary key (antecedants_id)
+)	
+go
+-----------------------------ici commence la logique de la table t_antecedants----------------------------------
+create procedure afficher_antecedants	
+	as
+		select top 50
+			antecedants_id as 'antecedants',
+			descriptions as 'descriptions'
+			status_antecedant as 'status_antecedant'
+		from t_antecedants
+			order by antecedant_id desc
+go
+create procedure  rechercher_antecedants
+	@descriptions nvarchar(max),
+	@status_antecedant boolean
+	as
+		from t_antecedants
+			where
+				status_antecedant like @status_antecedant
+			order by antecedant_id desc	
+go
+create procedure enregistrer_antecedant	
+	@antecedant_id int,
+	@descriptions nvarchar(max)
+	as
+		merge into t_antecedants
+		using(select @antecedant_id as x_id) as x_source
+		on(x_source.x_id=t_antecedants.antecedant_id)
+		when matched then
+			update set
+				descriptions=@descriptions,
+				status_antecedant=@status_antecedant
+		when not matched then
+			insert
+				(descriptions, status_antecedant)
+			values
+				(@descriptions, status_antecedant)	
+go
+create procedure supprimer_antecedant	
+	@antecedant_id int
+		as
+			delete from t_antecedants
+				where antecedant_id like @antecedant_id
+go
+create table t_history_pathologies
+(
+	id_history_pathologie int identity,
+	patient_id int,
+	pathologie_id int,
+	created_at date,
+	access_level nvarchar(50),
+	company_id nvarchar(50),
+	details nvarchar(max),
+	status_history_pathologie boolean
+	constraint pk_history_pathology primary key (id_history_pathologie)
+)	
+go
+alter table t_history_allergies add constraint fk_history_pathologies_t_pathologies
+	foreign key (pathologie_id) references t_pathologies(pathologie_id)
+-------------------------ici commence la logique de table t_history_pathologies-------------------------------
+create procedure afficher_history_pathologies
+	as
+		select top 20
+			id_history_pathologie as 'id_history_pathologie',
+			patient_id as 'patient_id',
+			pathologie_id as 'pathology_id',
+			created_at as 'created_at',
+			access_level as 'access_level',
+			company_id as 'access_level',
+			company_id as 'company_id',
+			details as 'details',
+			status_history_pathologie as 'status_history_pathologie'
+		from t_history_pathologies
+			order by id_history_pathologie desc
+go
+create procedure rechercher_history_pathologies
+	@patient_id int,
+	as
+		select top 20
+			id_history_pathologie as 'id_history_pathologie',
+			patient_id as 'patient_id',
+			pathologie_id as 'pathology_id',
+			created_at as 'created_at',
+			access_level as 'access_level',
+			company_id as 'access_level',
+			company_id as 'company_id',
+			details as 'details',
+			status_history_pathologie as 'status_history_pathologie'
+		from t_history_pathologies
+			where
+				patient_id like '%'+@patient_id+'%'
+			order by id_history_pathologie desc
+go
+create procedure enregistrer_history_pathologies
+	@id_history_pathologie int identity,
+	@patient_id int,
+	@pathologie_id int,
+	@created_at date,
+	@access_level nvarchar(50),
+	@company_id nvarchar(50),
+	@details nvarchar(max),
+	@status_history_pathologie boolean	
+		as
+			merge into t_history_pathologies
+				using(select@id_history_pathologie as x_id) as x_source
+				on(x_source.x_id=t_history_pathologies.id_history_pathologie)
+				when matched then
+					update set
+						patient_id=@patient_id,
+						pathologie_id=@pathologie_id,
+						created_at=@created_at,
+						access_level=@access_level,
+						company_id=@company_id,
+						details=@details,
+						status_history_pathologie=@status_history_pathologie
+				when not matched then
+					insert
+						(patient_id, pathologie_id, created_at, access_level, company_id, details, status_history_pathologie)
+					values
+						(@patient_id, @pathologie_id, @created_at, @access_level, @company_id, @details, @status_history_pathologie)	
+go
+create procedure supprimer_history_pathologies
+	@id_history_pathologie int								
+	as
+		delete from t_history_pathologies
+			where
+				id_history_pathologie like @id_history_pathologie
+go
+-----------------------------------ici se termine la logique de la table t_history_pathologies------------------------
+create table t_pathologies	
+(
+	pathologie_id int identity,
+	descriptions nvarchar(max),
+	status_pathologie boolean
+	constraint pk_pathologies primary key (pathologie_id)
+)		
+go
+-----------------------ici commence la logique de la table t_pathologies-------------------------------------
+create procedure afficher_pathologies 
+	as
+		select top 20
+			pathologie_id as 'pathologie_id',
+			descriptions as 'descriptions',
+			status_pathologie as 'status_pathologie'
+		from t_pathologies
+			order pathology_id desc	
+go
+create procedure rechercher_pathologies
+	@descriptions nvarchar(max)
+	as
+		select top 20
+			descriptions as 'descriptions'
+		from t_pathologies
+			where
+				descriptions like '%'+@descriptions+'%'
+		order by pathologies_id desc
+go
+create procedure enregistrer_pathologies	
+	@pathologie_id int,
+	@descriptions nvarchar(max)
+	as
+		merge into t_pathologies
+			using(select pathologie_id as x_id) as x_source
+			on(x_source.x_id=t_pathologies.pathologies_id)
+			when matched then
+				update set
+					descriptions=@descriptions,
+					status_pathologie=@status_pathologie
+			when not matched then
+				insert
+					(descriptions, status_pathologie)
+				values
+					(@descriptions, @status_pathologie)
+go
+create procedure supprimer_pathologies	
+	@pathologie_id int
+		as
+			delete from t_pathologies
+				where pathologie_id like @pathologie_id	
+go							
+-----------------------------------ici se termine la logique de la table t_pathologies-----------------------------------
+create table t_history_allergies
+(
+	id_history_allergies int identity,
+	patient_id int,
+	allergy_id int,
+	created_at date,
+	access_level nvarchar(50),
+	company_id nvarchar(50),
+	details nvarchar(max),
+	status_allergies boolean
+	constraint pk_pathologies primary key (id_history_allergies)
+)
+go
+alter table t_history_allergies add constraint fk_history_allergies_allergy_id
+	foreign key (allergy_id) references t_allergies(allergy_id)
+------------------ici commence la logique de la table t_history_allergies ____________________________________
+create procedure afficher_history_allergies
+	as
+		select top 20
+			id_history_allergies as 'history_allergies',
+			patient_id as 'patient_id',
+			allergy_id as 'allergy_id',
+			created_at as 'created_at',
+			access_level as 'access_level',
+			company_id as 'company_id',
+			details as 'details',
+			status_allergies as 'status_allergies'
+		from t_history_allergies
+			order by id_history_allergies desc	
+go
+create procedure rechercher_history_allergies
+	@allergy_id int
+	as
+		select top 50
+			id_history_allergies as 'history_allergies',
+			patient_id as 'patient_id',
+			allergy_id as 'allergy_id',
+			created_at as 'created_at',
+			access_level as 'access_level',
+			company_id as 'company_id',
+			details as 'details',
+			status_allergies as 'status_allergies'
+		from t_history_allergies
+			where
+				allergy_id like '%'+@allergy_id+'%'
+			order by id_history_allergies desc	
+go 
+create procedure enregistrer_antecedant_history_allergy	
+	@id_history_allergies int identity,
+	@patient_id int,
+	@allergy_id int,
+	@created_at date,
+	@access_level nvarchar(50),
+	@company_id nvarchar(50),
+	@details nvarchar(max),
+	@status_allergies boolean
+	as
+		merge into t_history_allergies
+			using (select @id_history_allergies as x_id) as x_source
+			on(x_source.x_id=t_history_allergies.id_history_allergies)
+			when matched then
+				update set
+					patient_id=@patient_id,
+					allergy_id=@allergy_id,
+					created_at=@created_at,
+					access_level=@access_level,
+					company_id=@company_id,
+					details=@details,
+					status_allergies=@status_allergies
+			when not matched then
+				insert
+					(patient_id, allergy_id, created_at, access_level, company_id, details, status_allergies)
+				values
+					(@patient_id, @allergy_id, @created_at, @access_level, @company_id, @details, @status_allergies);
+go
+create procedure supprimer_history_allergies
+	@allergy_id	int
+	as	
+		delete from t_history_allergies
+			where id_history_allergies like @id_history_allergies
+go
+------------------------ici se termine  la logique de la table t_history_allergies-------------------------------
+create table t_alergies
+	allergy_id int identity,
+	descriptions nvarchar(max)
+	status_allergies boolean
+	constraint pk_allergies primary key (allergy_id)
+	go
+	---------------------ici commence la logique de la table t_allergies-----------------------
+	create procedure afficher_allergies 
+		as
+			select top 20
+				allergy_id as 'pathology_id',
+				descriptions as 'descriptions',
+				status_allergies as 'status_allergies'
+			from t_allergies
+				order by allergy_id desc	
+go
+create procedure rechercher_allergies
+	@descriptions nvarchar(max)
+	as
+		select top 20
+			descriptions as 'descriptions'
+		from t_allergies
+			where
+				descriptions like '%'+@descriptions+'%'
+			order by allergy_id desc 
+go 
+create procedure enregistrer_allergies
+	@allergy_id int identity,
+	@descriptions nvarchar(max)
+	@status_allergies boolean
+    as
+		merge into t_alergies
+			using (select @allergy_id as x_id) as x_source
+			on(x_source.x_id=t_alergies.allergy_id)
+			when matched then
+				insert
+					(descriptions, status_allergies)
+				values
+					(@descriptions, @status_allergies)
+go
+create procedure supprimer_allergies	
+	@allergy_id int
+	as
+		delete from t_alergies
+			where allergy_id like @allergy_id				
+go
+------------------ici se termine la logique de la table t_allergies-----------------------
 create table t_procurement
 (
 	procurement_id nvarchar(50),
 	procurement_date date,
 	consumption_limit_date date,
 	expiration_date date,
-	product_id 
-
+	product_id nvarchar(50),
+	shape_id nvarchar(50),
+	category_id nvarchar(50),
+	container_id nvarchar(50),
+	quantity int,
+	supplier_id nvarchar(50),
+	total_quantity int,
+	access_level int,
+	company_id nvarchar(50),
+	active_status bit,
+	purchase_unit_price money
+	constraint pk_procurement primary key (procurement_id)
 )
+go
+-----------------------ici commence la logique de la table t_procurement-------------
+create procedure afficher_procurement
+	as
+		select top 20
+			procurement_id as 'procurement_id',
+			procurement_date as 'procurement_date',
+			consumption_limit_date as 'consumption_limit_date',
+			expiration_date as 'expiration_date',
+			product_id as 'product_id',
+			shape_id as 'shape',
+			category_id as 'category_id',
+			container_id as 'container_id',
+			quantity as 'quality',
+			supplier_id as 'supplier_id',
+			total_quantity as 'supplier',
+			access_level as 'access_level',
+			company_id as 'company_id',
+			active_status  as 'active_status',
+			purchase_unit_price as 'purchase_unit_price'
+	    from t_procurement
+		    order by procurement_id desc
+go
+create procedure rechercher_procurement	
+	@company_id nvarchar(50),
+	@product_id nvarchar(50),
+	@active_status bit
+	as
+		select top 20
+			procurement_id as 'procurement_id',
+			procurement_date as 'procurement_date',
+			consumption_limit_date as 'consumption_limit_date',
+			expiration_date as 'expiration_date',
+			product_id as 'product_id',
+			shape_id as 'shape',
+			category_id as 'category_id',
+			container_id as 'container_id',
+			quantity as 'quality',
+			supplier_id as 'supplier_id',
+			total_quantity as 'supplier',
+			access_level as 'access_level',
+			company_id as 'company_id',
+			active_status as 'active_status',
+			purchase_unit_price as 'purchase_unit_price'
+		from t_procurement
+			where
+				company_id and product_id like '%'+@company_id+'%'	and '%'+product_id+'%'
+			order by procurement_id desc
+go
+create procedure enregistrer_procurement
+	@procurement_id nvarchar(50),
+	@procurement_date date,
+	@consumption_limit_date date,
+	@expiration_date date,
+	@product_id nvarchar(50),
+	@shape_id nvarchar(50),
+	@category_id nvarchar(50),
+	@container_id nvarchar(50),
+	@quantity nvarchar(50),
+	@supplier_id nvarchar(50),
+	@total_quantity nvarchar(max),
+	@access_level int,
+	@company_id nvarchar(50),
+	@active_status bit,
+	@purchase_unit_price money	
+	as
+		merge into t_procurement
+			using(select @procurement_id as x_id) as x_source
+			on(x_source.x_id=t_procurement.procurement_id)	
+			when matched then
+				update set
+					procurement_date=@procurement_date,
+					consumption_limit_date=@consumption_limit_date,
+					expiration_date=@expiration_date,
+					product_id=@product_id,
+					shape_id=@shape_id,
+					category_id=@category_id,
+					container_id=@container_id,
+					quality=@quality,
+					supplier_id=@supplier_id,
+					total_quality=@total_quality,
+					access_level=@access_level,
+					company_id=@company_id,
+					purchase_unit_price=@purchase_unit_price
+			when not matched then
+				insert
+					(procurement_date, consumption_limit_date, expiration_date, product_id, shape_id, category_id,
+					 container_id, quality, supplier_id, total_quality, access_level, company_id, purchase_unit_price)
+				values
+					(@procurement_date, @consumption_limit_date, @expiration_date, @product_id, @shape_id, @category_id, 
+					@container_id, @quality, @supplier_id, @total_quality, @access_level, @company_id, @purchase_unit_price)
+go
+create procedure supprimer_procurement
+	@procurement_id
+	as
+		delete from t_procurement
+			where procurement_id like @procurement_id
+go
+----------------------------------ici se termine la logique de la table t_procurement------------------------------------
+go
+create table t_order_details
+(
+	order_detail_id int identity
+	order_id  int,
+	procurement_id  int,
+	order_date date,
+	quantity int ,
+	total_quantity int ,
+	access_level int,
+	company_id nvarchar(50)
+	constraint pk_order_details primary key (order_detail_id)
+)
+-------------------------------ici commence la logique de la table t_order_details-------------------------------
+create procedure afficher_order_details
+	as
+		select top 20
+			order_detail_id as 'order_detail_id',
+			order_id as 'order_id',
+			procurement_id as 'procurement_id',
+			order_date as 'order_date',
+			quality as 'quality',
+			total_quality as 'total_quality',
+			access_level as 'access_level',
+			company_id as company_id
+		from t_order_details
+			order by order_detail_id desc
+go
+create procedure rechercher_order_details				
+	@order_id int,
+    @company_id nvarchar(50)
+	as	
+		select top 20
+			order_detail_id as 'order_detail_id',
+			order_id as 'order_id',
+			procurement_id as 'procurement_id',
+			order_date as 'order_date',
+			quality as 'quality',
+			total_quality as 'total_quality',
+			access_level as 'access_level',
+			company_id as company_id
+		from t_order_details
+			where
+				order_id like '%'+@order_id+'%'
+			order by order_detail_id desc 
+go
+create procedure enregistrer_order_details
+	@order_detail_id int identity
+	@order_id  int,
+	@procurement_id  int,
+	@order_date date,
+	@quantity int ,
+	@total_quantity int ,
+	@access_level int,
+	@company_id nvarchar(50)
+	as
+		merge into t_order_details
+			using(select @order_detail_id as x_id) as x_source
+			on(x_source.x_id=t_order_details.order_detail_id)
+		    when matched then
+				update set
+					order_id=@order_id,
+					procurement_id=@procurement_id,
+					order_date=@order_date,
+					quantity=@quantity,
+					total_quantity=@total_quantity,
+					access_level=@access_level,
+					company_id=@company_id
+			when not matched then
+				insert
+					(order_id, procurement_id, order_date, quantity, total_quantity, access_level, company_id)
+				values
+					
+					(@order_id, @procurement_id, @order_date, @quantity, @total_quantity, @access_level, @company_id)
+go
+create procedure supprimer_order_details
+	@order_detail_id int
+	as	
+		delete from t_order_details
+			where order_detail_id like @order_detail_id					
+go
+----------------------ici se termine la logique de la table t_order_details-----------------------------
 
