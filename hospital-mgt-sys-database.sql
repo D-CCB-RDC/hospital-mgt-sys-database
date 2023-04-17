@@ -919,3 +919,427 @@ create table t_procurement
 
 )
 
+----------------------- TABLES -----------------------
+
+create table procurement (
+    procurement_id int identity,
+    procurement_date date,
+    consumption_limit_date date,
+    expiration_date date,
+    product_id int,
+    shape_id int,
+    category_id int,
+    container_id int,
+    quantity int,
+    supplier_id,
+    total_quantity int,
+    access_level nvarchar(50),
+    company_id int,
+    purchase_unit_price money,
+    sale_unit_price money,
+    fabrication_date date,
+    active_status boolean,
+    constraint pk_procurement primary key (procurement_id)
+);
+
+create table product (
+    product_id int identity,
+    designation nvarchar(max),
+    qty_alert int,
+    constraint pk_products primary key (product_id)
+);
+
+create table shape (
+    shape_id int identity,
+    designation nvarchar(max),
+    constraint pk_shape primary key (shape_id)
+);
+
+create table category (
+    category_id int identity,
+    designation nvarchar(max),
+    constraint pk_designation primary key (category_id)
+);
+
+create table container (
+    container_id int identity,
+    designation nvarchar(max),
+    constraint pk_container primary key (container_id)
+);
+
+create table supplier (
+    supplier_id int identity,
+    names nvarchar(max),
+    phone nvarchar(15),
+    addresses nvarchar(max),
+    email nvarchar(max),
+    constraint pk_supplier primary key (supplier_id)
+);
+
+create table order_details (
+    order_details_id int identity,
+    order_id int,
+    procurement_id int,
+    order_date date,
+    quantity int,
+    total_quantity int,
+    access_level nvarchar(50),
+    company_id int,
+    constraint pk_order_details primary key (order_details_id)
+);
+
+create table order (
+    order_id int identity,
+    order_date date,
+    quantity int,
+    total_quantity date,
+    access_level nvarchar(50),
+    comapny_id int,
+    constraint pk_order primary key (order_id)
+);
+
+----------------------- FOREIGN KEYS -----------------------
+
+alter table procurement
+add constraint fk_products_procurement
+foreign key (product_id)
+references product(product_id);
+
+alter table procurement
+add constraint fk_shape_procurement
+foreign key (shape_id)
+references shape(shape_id);
+
+alter table procurement
+add constraint fk_category_procurement
+foreign key (category_id)
+references category(category_id);
+
+alter table procurement
+add constraint fk_container_procurement
+foreign key (container_id)
+references container(container_id);
+
+alter table procurement
+add constraint fk_supplier_procurement
+foreign key (supplier_id)
+references supplier(supplier_id);
+
+alter table order_details
+add constraint fk_procurement_order_details
+foreign key (procurement_id)
+references procurement(procurement_id);
+
+alter table order
+add constraint fk_order_details_order
+foreign key (order_details_id)
+references order_details(order_details_id);
+
+----------------------- LOGIC -----------------------
+
+----------------------- DISPLAY PROCEDURES -----------------------
+
+create procedure afficher_procurement
+	as 
+	select top 20
+		procurement_id as 'Procurement Id.',
+        procurement_date as 'Procurement Date',
+        consumption_limit_date as 'Cunsumption limit Date',
+        expiration_date as 'Expiration Date',
+        product_id as 'Product Id.',
+        shape_id as 'Shape Id.',
+        category_id as 'Category Id.',
+        container_id as 'Container id.',
+        quantity as 'Quantity',
+        supplier_id as 'Supplier Id.',
+        total_quantity as 'Total Quantity',
+        access_level as 'Access Level',
+        company_id as 'Company Id.',
+        purchase_unit_price as 'Product Unit Price',
+        sale_unit_price as 'Sale Unit Price',
+        fabrication_date as 'Fabrication Date',
+        active_status as 'Active Status'
+	from procurement
+		order by procurement_id desc;
+go
+
+create procedure afficher_product
+	as 
+	select top 20
+		product_id as 'Product Id.',
+        designation as 'Designation',
+        qty_alert as 'Quantity Alert'
+	from product
+		order by product_id desc;
+go
+
+create procedure afficher_shape
+	as 
+	select top 20
+		shape_id as 'Shape Id.',
+        designation as 'Designation',
+	from shape
+		order by shape_id desc;
+go
+
+create procedure afficher_category
+	as 
+	select top 20
+		category_id as 'Category Id.',
+        designation as 'Designation',
+	from category
+		order by category_id desc;
+go
+
+create procedure afficher_container
+	as 
+	select top 20
+		container_id as 'Container Id.',
+        designation as 'Designation',
+	from container
+		order by container_id desc;
+go
+
+create procedure afficher_supplier
+	as 
+	select top 20
+		supplier_id as 'Supplier Id.',
+        names as 'Names',
+        phone as 'Phone Number',
+        addresses as 'Physical Address',
+        email as 'Email Addrerss'
+	from supplier
+		order by supplier_id desc;
+go
+
+create procedure afficher_order_detail
+	as 
+	select top 20
+		order_detail_id as 'Order Details Id.',
+        order_id as 'Order Id.',
+        procurememt_id as 'Procurement Id.',
+        order_date as 'Order Date',
+        quantity as 'Quantity',
+        total_quantity as 'Total Quantity',
+        access_level as 'Access Level',
+        company_id as 'Company Id.'
+	from order_detail
+		order by order_detail_id desc;
+go
+
+create procedure afficher_order
+	as 
+	select top 20
+        order_id as 'Order Id.',
+        order_date as 'Order Date',
+        quantity as 'Quantity',
+        total_quantity as 'Total Quantity',
+        access_level as 'Access Level',
+        company_id as 'Company Id.'
+	from order_detail
+		order by order_detail_id desc;
+go
+
+----------------------- RESEARCH PROCEDURES -----------------------
+
+create procedure rechercher_procurement
+	@procurement_id int,
+    @procurement_date date,
+    @expiration_date date,
+    @supplier_id int
+	as
+	select top 20
+		procurement_id as 'Procurement Id.',
+        procurement_date as 'Procurement Date',
+        consumption_limit_date as 'Cunsumption limit Date',
+        expiration_date as 'Expiration Date',
+        product_id as 'Product Id.',
+        shape_id as 'Shape Id.',
+        category_id as 'Category Id.',
+        container_id as 'Container id.',
+        quantity as 'Quantity',
+        supplier_id as 'Supplier Id.',
+        total_quantity as 'Total Quantity',
+        access_level as 'Access Level',
+        company_id as 'Company Id.',
+        purchase_unit_price as 'Product Unit Price',
+        sale_unit_price as 'Sale Unit Price',
+        fabrication_date as 'Fabrication Date',
+        active_status as 'Active Status'
+	from procurement
+	   where
+	   		procurement_id like '%'+@procurement_id+'%',
+            procurement_date like '%'+@procurement_date+'%',
+            expiration_date like '%'+@expiration_date+'%',
+            supplier_id like '%'+@supplier_id+'%'
+		order by procurement_id desc;			
+go
+
+create procedure rechercher_product
+    @product_id int
+    as
+        select top 20 
+            product_id as 'Product Id.',
+            designation as 'Designation',
+            qty_alert as 'Quantity Alert'
+        from product
+            where
+                product_id like '%' + @product_id + '%'
+            order by product_id desc;
+go
+
+create procedure rechercher_shape
+    @shape_id int
+    as
+        select top 20
+            shape_id as 'Shape Id.',
+            designation as 'Designation'
+        from shape
+            where
+                shape_id like '%' + shape_id + '%'
+            order by shape_id desc;
+go
+
+create procedure rechercher_category
+    @category_id int
+    as
+        select top 20
+            category_id as 'Category_id',
+            designation as 'Designation'
+        from category
+            where
+                category_id like '%' + @category_id + '%'
+            order by category_id desc;
+go
+
+create procedure rechercher_container
+    @container_id int
+    as
+        select top 20
+            container_id as 'Container Id.',
+            designation as 'Designation'
+        from container
+            where
+                container_id like '%' + @container_id + '%'
+            order by container_id desc;
+go
+
+create procedure rechercher_supplier
+    @supplier_id int,
+    @names nvarchar(max)
+    as
+        select top 20
+            supplier_id as 'Supplier Id.',
+            names as 'Names',
+            phone as 'Phone Number',
+            addresses as 'Physical Address',
+            email as 'Email Address'
+        from supplier
+            where
+                supplier_id like '%' + @supplier_id + '%',
+                names like '%' + @names + '%'
+            order by supplier_id desc;
+go
+
+create procedure rechercher_order_details
+    @order_details_id int,
+    @order_id int,
+    @company_id int
+    as
+        select top 20
+            order_details_id as 'Order Details Id.',
+            order_id as 'Order Id.',
+            procurement_id as 'Procurement Id.'
+            order_date as 'Order Date',
+            quantity as 'Quantity',
+            total_quantity as 'Total Quantity',
+            access_level as 'Access Level',
+            company_id as 'Company Id.'
+        from order_details
+            where
+                order_details_id like '%' + @order_detail_id + '%',
+                order_id like '%' + @order_id + '%',
+                company_id like '%' + @company_id + '%'
+            order by order_details_id desc;
+go
+
+create procedure rechercher_order
+    @order_id int,
+    @order_date date
+    as
+        select top 20
+            order_id as 'Order Id.',
+            order_date as 'Order Date',
+            quantity as 'Quantity',
+            total_quantity as 'Total Quantity',
+            access_leevl as 'Access Level',
+            company_id as 'Company Id.'
+        from order
+            where
+                order_id like '%' + @order_id + '%',
+                order_date like '%' + order_date + '%'
+            order by order_id desc;
+go
+
+----------------------- REGISTER PROCEDURES -----------------------
+
+create procedure enregistrer_procurement
+    @procurement_id int,
+    @procurement_date date,
+    @consumption_limit_date date,
+    @expiration_date date,
+    @product_id int,
+    @shape_id int,
+    @category_id int,
+    @container_id int,
+    @quantity int,
+    @supplier_id int,
+    @total_quantity int,
+    @access_level nvarchar(50),
+    @company_id int,
+    @purchase_unit_price money,
+    @sale_unit_price money,
+    @fabrication_date date,
+    @active_status boolean
+	as
+		merge into procurement
+			using (select @procurement_id as x_id) as x_source
+			on(x_source.x_id = procurement.procurement_id)
+			when matched then
+				update set	
+					procurement_id = @procurement_id,
+                    procurement_date = @procurement_date,
+                    consumption_limit_date = @consumption_limit_date,
+                    expiration_date = @expiration_date,
+                    product_id = @product_id,
+                    shape_id = @shape_id,
+                    category_id = @category_id,
+                    container_id = @container_id,
+                    quantity = @quantity,
+                    supplier_id = @supplier_id,
+                    total_quantity = @total_quantity,
+                    access_level = @access_level,
+                    company_id = @company_id,
+                    purchase_unit_price = @purchase_unit_price,
+                    sale_unit_price = @sale_unit_price,
+                    fabrication_date = @fabrication_date,
+                    active_status = true
+			when not matched then
+				insert
+					(procurement_id, procurement_date, consumption_limit_date, expiration_date, product_id, shape_id, category_id, container_id, quantity, supplier_id, total_quantity, access_level, company_id, purchase_unit_price, sale_unit_price, fabrication_date, active_status)
+				values
+					(@procurement_id, @procurement_date, @consumption_limit_date, @expiration_date, @product_id, @shape_id, @category_id, @container_id, @quantity, @supplier_id, @total_quantity, @access_level, @company_id, @purchase_unit_price, @sale_unit_price, @fabrication_date, @active_status);
+go
+
+----------------------- DELETE PROCEDURES -----------------------
+
+create procedure supprimer_procurement
+	@procurement_id int
+	as
+		merge into procurement
+            using (@procurement_id as x_id) as x_source
+            on (x_source.x_id = procurement.procurement_id)
+            when matched then
+                update set
+			        active_status = false;
+go
