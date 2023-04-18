@@ -15,41 +15,43 @@ create table t_company
 	adresse nvarchar(max),
 	email nvarchar(50),
 	telephone nvarchar(15),
-	legal_info nvarchar(max)
+	legal_info nvarchar(max),
 	constraint pk_company primary key (company_id)
 )
 go
 ---------------------ici commence la logique de la table t_company---------------------------
-create procedure afficher t_company
+create procedure afficher_t_company
 	as 
 	select top 20
-		company_id as 'company_id',
-		company_name as 'company_name',
-		logo as 'logo',
-		adresse as 'adresse',
-		email as 'email',
-		telephone as 'telephone',
-		legal_info as 'legal_info'
+		company_id as 'Company Id.',
+		company_name as 'Company Name',
+		logo as 'Logo',
+		adresse as 'Address',
+		email as 'Email',
+		telephone as 'Phone Number',
+		legal_info as 'Legal Informations'
 	from t_company
-		order by company_id desc
+		order by company_id desc;
 go
-create procedure rechercher company_name
+
+create procedure rechercher_company_name
 	@company_name nvarchar(50)
 	as
 	select top 20
-		company_id as 'company_id',
-		company_name as 'company_name',
-		logo as 'logo',
-		adresse as 'adresse',
-		email as 'email',
-		telephone as 'telephone',
-		legal_info as 'legal_info'
+		company_id as 'Company Id',
+		company_name as 'Company Name',
+		logo as 'Logo',
+		adresse as 'Address',
+		email as 'Email',
+		telephone as 'Phone Number',
+		legal_info as 'Legal Informations'
 	from t_company
 	   where
-	   		company_name like '%'+@company_name+%
-		order by company_id desc				
+	   		company_name like '%'+@company_name+'%'
+		order by company_id desc;			
 go
-create procedure enregistrer company_name
+
+create procedure enregistrer_company_name
 		@company_id nvarchar(50),
 		@company_name nvarchar(50),
 		@logo nvarchar(max),
@@ -60,60 +62,61 @@ create procedure enregistrer company_name
 	as
 		merge into t_company
 			using (select @company_id as x_id) as x_source
-			on(x_source.x_id=t_company.company_id)
+			on(x_source.x_id = t_company.company_id)
 			when matched then
 				update set	
-					company_name=@company_name
-					logo =@logo
-					adresse=@adresse
-					email=@email
-					telephone=@telephone
-					legal_info=@ legal_info
+					company_name = @company_name,
+					logo = @logo,
+					adresse = @adresse,
+					email = @email,
+					telephone = @telephone,
+					legal_info = @ legal_info
 			when not matched then
 				insert
 					(company_name, logo, adresse, telephone, legal_info)
 				values
-					(@company_name, @logo, @adresse, @telephone, @legal_info)
+					(@company_name, @logo, @adresse, @telephone, @legal_info);
 go
+
 create procedure supprimer t_company
 	@company_id int
 	as
 		delete from t_company
-			where company_id like @company_id
-go			
------------------------ici se termine la logique de la table t_company--------------------------
+			where company_id like @company_id;
 go
 
-create table t_users
-	(
-		user_id int identity,
-		names nvarchar(100),
-		position_id nvarchar(20),
-		level_id nvarchar(10),
-		passwords nvarchar(20),
-		isactive bit,
-		email nvarchar(50),
-		telephone nvarchar(15),
-		company_id nvarchar(50)
+-----------------------ici se termine la logique de la table t_company--------------------------
+
+create table t_users (
+	user_id int identity,
+	names nvarchar(100),
+	position_id nvarchar(20),
+	level_id nvarchar(10),
+	passwords nvarchar(20),
+	isactive bit,
+	email nvarchar(50),
+	telephone nvarchar(15),
+	company_id nvarchar(50)
 	constraint pk_users primary key (user_id)
-)
+);
 go
 -------------------ici commence la logique du table t_users-----------------
-create procedure afficher t_users
-	as
-		select top 20
-			user_id as 'user_id',
-			names as 'names',
-			position_id as 'position',
-			level_id  as 'level_id',
-			passwords  as 'passwords',
-			isactive  as 'isactive',
-			email  as 'email',
-			telephone  as 'email',
-			company_id  as 'company_id'
-        from t_users
-		    order by user_id desc
+create procedure afficher_t_users
+as
+	select top 20
+		user_id as 'User Id',
+		names as 'Names',
+		position_id as 'Position',
+		level_id  as 'Level Id',
+		passwords  as 'Passwords',
+		isactive  as 'Status',
+		email  as 'email',
+		telephone  as 'email',
+		company_id  as 'company_id'
+	from t_users
+		order by user_id desc;
 go
+
 create procedure rechercher_names
 	@names nvarchar(100)
 	as
@@ -130,8 +133,9 @@ create procedure rechercher_names
 	from  t_users
 	    where
 		  	names like '%'+@names+'%'
-		order by user_id desc
+		order by user_id desc;
 go
+
 create procedure enregistrer_users
 	@user_id int,
 	@names nvarchar(100),
@@ -153,39 +157,44 @@ create procedure enregistrer_users
 					level_id=@level_id,
 					passwords=@passwords,
 					isactive=@isactive,
-					email=@email
-					telephone=@telephone
+					email=@email,
+					telephone=@telephone,
 					company_id=@company_id
 			when not matched then
 			   insert
 			      (names, position_id, level_id, passwords, isactive, email, telephone, company_id)
 			   values
-			      (@names, @position_id, @level_id, @passwords, @isactive, @email, @telephone, @company_id)
+			      (@names, @position_id, @level_id, @passwords, @isactive, @email, @telephone, @company_id);
 go
+
 create procedure supprimer_users
 	@user_id int
 	as
 		delete from t_users
-			where user_id like @user_id
+			where user_id like @user_id;
 go
--------------------ici se termine la logique du table t_user-------------------			
+
+-------------------ici se termine la logique du table t_user-------------------		
+
 create table t_position
 (
 	position_id nvarchar(40),
-	descriptions nvarchar(max)
+	descriptions nvarchar(max),
 	constraint pk_position primary key (position_id)
-)
+);
 go
+
 -----------------ici commence la logique de la table t_position----------------
-go
+
 create procedure afficher_position
 	as
 		select top 10 
 			position_id as 'position_id',
 			descriptions as 'descriptions'
 		from t_position
-			order by position_id desc
+			order by position_id desc;
 go
+
 create procedure rechercher_position
 	@position_id
 	as
@@ -195,8 +204,9 @@ create procedure rechercher_position
 	from t_position
 		where
 			position_id like '%+@position_id+@'
-		order by position_id desc
+		order by position_id desc;
 go
+
 create procedure  enregistrer_position
 	@position_id nvarchar(40),
 	@descriptions nvarchar(max)
@@ -211,19 +221,21 @@ create procedure  enregistrer_position
 				insert
 					(descriptions)
 				values
-					(@descriptions)
+					(@descriptions);
 go
+
 create procedure supprimer_position
 	@position_id nvarchar(40)
 	as
 		delete from t_position
-			when position_id like @position_id						
+			when position_id like @position_id;					
 go			
 ----------------ici se termine la logique de la table t_position-----------------
+
 create table t_level
 (
 	level_id nvarchar(40),
-	descriptions nvarchar(max)
+	descriptions nvarchar(max),
 	constraint pk_level primary key (level_id)
 )
 go
@@ -234,8 +246,9 @@ create procedure afficher_level_id
 			level_id as 'level_id',
 			descriptions as 'descriptions'
 		from t_level
-			order by level_id desc
+			order by level_id desc;
 go
+
 create procedure  rechercher_level_id
 	@level_id
 	as
@@ -245,8 +258,9 @@ create procedure  rechercher_level_id
 		from t_level
 			where
 				level_id like '%'+level_id+'%' 
-			order by level_id desc
+			order by level_id desc;
 go
+
 create procedure enregistrer_level_id
 	@level_id nvarchar(40),
 	@descriptions nvarchar(max)
@@ -261,16 +275,18 @@ create procedure enregistrer_level_id
 				insert 
 					(descriptions)
 				values
-					(@descriptions)
+					(@descriptions);
 go
+
 create procedure supprimer_level
 	@level_id nvarchar(40)
 	as
 		delete from t_level
-			where level_id like @level_id			
------------------ici se termine la logique de la table t_level----------------------
+			where level_id like @level_id;			
 go
+
 ---------------- Hospital Management System-Registration-----------------------------
+
 create table t_patient
 (
 	id_patient int identity,
@@ -290,35 +306,37 @@ create table t_patient
     blood_group nvarchar(10),
 	access_level nvarchar(50),
 	company_id nvarchar(50),
-	status boolean
+	active_status boolean,
 	constraint pk_patient primary key (id_patient)
-)
+);
 go
 -------------------ici commence la logique de la table t_patient----------------
+
 create procedure afficher_patient
 	as
 	select top 20
-		id_patient as 'id_patient'
-		patient_type_id as 'patient_type_id',
-		names as 'names',
-		gender as 'gender',
-		birthday_date  as 'birthday_date',
-		nationality as 'nationality',
-		father_names as 'father_names',
-		mother_names as 'mother_names',
-		profession as 'profession',
-		adress as 'adress',
-		telephone as 'telephone',
-		reference_name 'reference_name',
-		reference_phone as 'reference',
-		attach_hospital as 'attach_hospital',
-		blood_group  as 'blood_group',
-		access_level as 'access_level',
-		company_id as 'company_id',
-		status as 'status'
+		id_patient as 'Patient Id',
+		patient_type_id as 'Patient Id Type',
+		names as 'Names',
+		gender as 'Gender',
+		birthday_date  as 'Birthday Date',
+		nationality as 'Nationality',
+		father_names as 'Father Names',
+		mother_names as 'Mother Names',
+		profession as 'Profession',
+		adress as 'Address',
+		telephone as 'Phone Number',
+		reference_name 'Reference Name',
+		reference_phone as 'Reference',
+		attach_hospital as 'Attached Hospital',
+		blood_group  as 'Blood Group',
+		access_level as 'Access Level',
+		company_id as 'Company Id',
+		active_status as 'Status'
 	from  t_patient
-		order by id_patient desc
+		order by id_patient desc;
 go
+
 create procedure rechercher_patient
 	@names nvarchar(100)
 	as
