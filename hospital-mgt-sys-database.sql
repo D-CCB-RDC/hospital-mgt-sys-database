@@ -313,7 +313,7 @@ create procedure afficher_patient
 		reference_phone as 'reference',
 		attach_hospital as 'attach_hospital',
 		blood_group  as 'blood_group',
-		access_level as 'access_leve',
+		access_level as 'access_level',
 		company_id as 'company_id',
 		status as 'status'
 	from  t_patient
@@ -338,7 +338,7 @@ create procedure rechercher_patient
 			reference_phone as 'reference',
 			attach_hospital as 'attach_hospital',
 			blood_group  as 'blood_group',
-			access_level as 'access_leve',
+			access_level as 'access_level',
 			company_id as 'company_id',
 			status boolean
 	from t_patient	
@@ -385,15 +385,15 @@ create procedure enregistrer_patient
 					reference_phone=@reference_phone,
 					attach_hospital=@attach_hospital,
 					blood_group=@blood_group,
-					access_leve=@access_leve,
+					access_level=@access_level,
 					company_id=@company_id
 			when not matched then
 				insert
 					(patient_type_id, names, gender, birthday_date, 
-					nationality, father_names, mother_names, profession, reference, reference_phone, attach_hospital, blood_group, access_leve, company_id)
+					nationality, father_names, mother_names, profession, reference, reference_phone, attach_hospital, blood_group, access_level, company_id)
 				values	
 					(@patient_type_id, @names, @gender, @birthday_date, 
-					@nationality, @father_names, @mother_names, @profession, @reference, @reference_phone, @attach_hospital, @blood_group, @access_leve, @company_id)
+					@nationality, @father_names, @mother_names, @profession, @reference, @reference_phone, @attach_hospital, @blood_group, @access_level, @company_id)
 go
 create procedure supprimer_patient
 	@id_patient int
@@ -1112,10 +1112,10 @@ create procedure afficher_supplier
 		order by supplier_id desc;
 go
 
-create procedure afficher_order_detail
+create procedure afficher_order_details
 	as 
 	select top 20
-		order_detail_id as 'Order Details Id.',
+		order_details_id as 'Order Details Id.',
         order_id as 'Order Id.',
         procurememt_id as 'Procurement Id.',
         order_date as 'Order Date',
@@ -1123,8 +1123,8 @@ create procedure afficher_order_detail
         total_quantity as 'Total Quantity',
         access_level as 'Access Level',
         company_id as 'Company Id.'
-	from order_detail
-		order by order_detail_id desc;
+	from order_details
+		order by order_details_id desc;
 go
 
 create procedure afficher_order
@@ -1136,8 +1136,8 @@ create procedure afficher_order
         total_quantity as 'Total Quantity',
         access_level as 'Access Level',
         company_id as 'Company Id.'
-	from order_detail
-		order by order_detail_id desc;
+	from order_details
+		order by order_details_id desc;
 go
 
 ----------------------- RESEARCH PROCEDURES -----------------------
@@ -1257,7 +1257,7 @@ create procedure rechercher_order_details
             company_id as 'Company Id.'
         from order_details
             where
-                order_details_id like '%' + @order_detail_id + '%',
+                order_details_id like '%' + @order_details_id + '%',
                 order_id like '%' + @order_id + '%',
                 company_id like '%' + @company_id + '%'
             order by order_details_id desc;
@@ -1272,7 +1272,7 @@ create procedure rechercher_order
             order_date as 'Order Date',
             quantity as 'Quantity',
             total_quantity as 'Total Quantity',
-            access_leevl as 'Access Level',
+            access_level as 'Access Level',
             company_id as 'Company Id.'
         from order
             where
@@ -1331,6 +1331,133 @@ create procedure enregistrer_procurement
 					(@procurement_id, @procurement_date, @consumption_limit_date, @expiration_date, @product_id, @shape_id, @category_id, @container_id, @quantity, @supplier_id, @total_quantity, @access_level, @company_id, @purchase_unit_price, @sale_unit_price, @fabrication_date, @active_status);
 go
 
+create procedure enregistrer_product
+	@product_id int,
+	@designation nvarchar(max),
+	@qty_alert nvarchar(50)
+	as
+		merge into product
+			using (select @product_id as x_id) as x_source
+			on (x_source.x_id = product.product_id)
+			when matched then
+				update set
+					product_id = @product_id,
+					designation = @designation,
+					qty_alert = @qty_alert
+			when not matched then
+				insert
+					(product_id, designation, qty_alert)
+				values
+					(@product_id, @designation, @qty_alert);
+go
+
+create procedure enregistrer_shape
+	@shape_id int,
+	@designation nvarchar(max)
+	as
+		merge into shape
+			using (select @shape_id as x_id) as x_source
+			on (x_source.x_id = shape.shape_id)
+			when matched then
+				update set
+					shape_id = @shape_id,
+					designation = @designation
+			when not matched then
+				insert
+					(shape_id, designation)
+				values
+					(@shape_id, @designation);
+go
+
+create procedure enregistrer_category
+	@category_id int,
+	@designation nvarchar(max)
+	as
+		merge into category
+			using (select @category_id as x_id) as x_source
+			on (x_source.x_id = category.category_id)
+			when matched then
+				update set
+					category_id = @category_id,
+					designation = @designation
+			when not matched then
+				insert
+					(category_id, designation)
+				values
+					(@category_id, @designation);
+go
+
+create procedure enregistrer_container
+	@container_id int,
+	@designation nvarchar(max)
+	as
+		merge into container
+			using (select @container_id as x_id) as x_source
+			on (x_source.x_id = container.container_id)
+			when matched then
+				update set
+					container_id = @container_id,
+					designation = @designation
+			when not matched then
+				insert
+					(container_id, designation)
+				values
+					(@container_id, @designation);
+go
+
+create procedure enregistrer_supplier
+	@supplier_id int,
+	@names nvarchar(max),
+	@phone nvarchar(15),
+	@addresses nvarchar(max),
+	@email nvarchar(max)
+	as
+		merge into supplier
+			using (select @supplier_id as x_id) as x_source
+			on (x_source.x_id = supplier.supplier)
+			when not matched then
+				update set 
+					supplier_id = @supplier_id,
+					names = @names,
+					phone = @phone,
+					addresses = @addresses,
+					email = @email
+			when not matched then
+				insert
+					(supplier_id, names, phone, addresses, email) 
+				into
+					(@supplier_id, @names, @phone, @addresses, @email);
+go
+
+create procedure enregistrer_order_details
+	@order_details_id int,
+	@order_id int,
+	@procurememt_id int,
+	@order_date date,
+	@quantity int,
+	@total_quantity int,
+	@access_level nvarchar(50),
+	@company_id int
+	as
+		merge into order_details
+			using (order_details_id as x_id) as x_source
+			on (x_source.x_id = order_details.order_details_id)
+			when matched then
+				update set
+					order_details_id = @order_details_id,
+					order_id = @order_id,
+					procurement_id = @procurement_id,
+					order_date = @order_date,
+					quantity = @quantity,
+					total_quantity = @total_quantity,
+					access_level = @access_level,
+					comapny_id = @comapny_id
+			when not matched then
+				insert
+					(order_date, order_id, order_id, procurement_id, order_date, quantity, total_quantity, access_level, comapny_id)
+				values
+					(@order_date, @order_id, @order_id, @procurement_id, @order_date, @quantity, @total_quantity, @access_level, @comapny_id);
+					
 ----------------------- DELETE PROCEDURES -----------------------
 
 create procedure supprimer_procurement
