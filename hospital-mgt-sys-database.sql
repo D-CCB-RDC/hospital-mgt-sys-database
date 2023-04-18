@@ -1457,7 +1457,34 @@ create procedure enregistrer_order_details
 					(order_date, order_id, order_id, procurement_id, order_date, quantity, total_quantity, access_level, comapny_id)
 				values
 					(@order_date, @order_id, @order_id, @procurement_id, @order_date, @quantity, @total_quantity, @access_level, @comapny_id);
-					
+go
+
+create procedure enregistrer_order
+	@order_id int,
+	@order_date date,
+	@quantity int,
+	@total_quantity int,
+	@access_level nvarchar(50),
+	@comapny_id int
+	as
+		merge into order
+			using (order_id as x_source) as x_source
+			on (x_source.x_id = order.order_id)
+			when matched then
+				update set
+					order_id = @order_id,
+					order_date = @order_date,
+					quantity = @quantity
+					total_quantity = @total_quantity,
+					access_level = @access_level,
+					company_id = @company_id
+			when not matched
+				insert
+					(order_id, order_date, quantity, total_quantity, access_level, company_id)
+				values
+					(@order_id, @order_date, @quantity, @total_quantity, @access_level, @company_id);
+go
+				
 ----------------------- DELETE PROCEDURES -----------------------
 
 create procedure supprimer_procurement
