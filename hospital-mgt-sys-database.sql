@@ -599,7 +599,7 @@ create procedure rechercher_id_checking_medical
 go
 create procedure enregistrer_checking_medical	
 	@id_checking_medical int,
-	@id_company nvarchar(50),
+	@company_id nvarchar(50),
 	@access_level nvarchar(40),
 	@id_patient int,
 	@id_departement_test nvarchar(50),
@@ -612,7 +612,7 @@ create procedure enregistrer_checking_medical
 				on(x_source.x_id=t_checking_medical.id_checking_medical)
 				when matched then
 					update set
-						id_company=@id_company,
+						company_id=@company_id,
 						access_level=@access_level,
 						id_patient=@id_patient,
 						id_departement=@id_departement,
@@ -717,11 +717,11 @@ create procedure rechercher_interpretations
 	@id_resultat_checking int
 	as
 		select top 20
-			id_interpretations as 'id_interpretations',
-			id_resultat_checking as 'id_resultat_checking',
-			descriptions as 'descriptions',
-			observations as 'observations',
-			decision_medical as 'decision_medical'
+			id_interpretations as 'Interpretations Id.',
+			id_resultat_checking as 'Checking Results Id.',
+			descriptions as 'Descriptions',
+			observations as 'Observations',
+			decision_medical as 'Medical Decision'
         from t_interpretations_resultats
 			where
 				id_resultat_checking like '%'+@id_resultat_checking
@@ -760,7 +760,7 @@ go
 create table t_prix_tests_medicaux
 (
 	id_prix_test int,
-	id_company nvarchar(50),
+	company_id nvarchar(50),
 	id_test_medical int,
 	prix_usd money,
 	prix_fc money,
@@ -772,37 +772,37 @@ go
 create procedure afficher_prix_tests_medicaux	
 	as 
 		select top 20
-			id_prix_test as 'id_prix_test',
-			id_company as 'id_company',
-			id_test_medical as 'id_test_medical',
-			prix_usd as 'prix_usd',
-			prix_fc as 'prix_fc',
-			active_status as 'active_status',
-			date_enregistrement as 'date_enregistrement'
+			id_prix_test as 'Medical Test Id.',
+			company_id as 'Company Id.',
+			id_test_medical as 'Medical Test Id.',
+			prix_usd as 'Price USD',
+			prix_fc as 'Price UCF',
+			active_status as 'Active Status',
+			date_enregistrement as 'Register Date'
 		from t_prix_tests_medicaux
 			order by id_prix_test desc
 go
 create procedure rechercher_prix_tests_medicaux			
-	@id_company nvarchar(50),
+	@company_id nvarchar(50),
 	@active_status bit
 	as
 		select top 20
-			id_prix_test as 'id_prix_test',
-			id_company as 'id_company',
-			id_test_medical as 'id_test_medical',
-			prix_usd as 'prix_usd',
-			prix_fc as 'prix_fc',
-			active_status as 'active_status',
-			date_enregistrement as 'date_enregistrement'
+			id_prix_test as 'Medical Test Id.',
+			company_id as 'Company Id.',
+			id_test_medical as 'Medical Test Id.',
+			prix_usd as 'Price USD',
+			prix_fc as 'Price UCF',
+			active_status as 'Active Status',
+			date_enregistrement as 'Register Date'
 		from t_prix_tests_medicaux
 			where
-				id_company like '%'+@id_company+'%' and active_status = true
+				company_id like '%'+@company_id+'%' and active_status = true
 			order by id_prix_test desc					
 )
 go
 create procedure enregistrer_prix_tests_medicaux
 	@id_prix_test int,
-	@id_company nvarchar(50),
+	@company_id nvarchar(50),
 	@id_test_medical int,
 	@prix_usd money,
 	@prix_fc money,
@@ -814,12 +814,10 @@ create procedure enregistrer_prix_tests_medicaux
 			on(x_source.x_id=t_prix_tests_medicaux.id_prix_test)
 		when not matched then
 			insert
-				(id_checking_medical, id_test_medical,
-				 prix_usd, prix_fc, active_status, date_enregistrement)
+				(id_checking_medical, id_test_medical, prix_usd, prix_fc, active_status, date_enregistrement)
 			values
 				
-				(@id_checking_medical, @id_test_medical,
-				 @prix_usd, @prix_fc, @active_status, @date_enregistrement)
+				(@id_checking_medical, @id_test_medical, @prix_usd, @prix_fc, @active_status, @date_enregistrement)
 go
 create procedure supprimer_prix_tests_medicaux
 	@id_prix_test int
@@ -838,8 +836,8 @@ create table t_departement_tests
 create procedure afficher_departement_tests
 	as
 		select top 50
-			id_departement_test as 'id_departement-tests',
-			descriptions as 'descriptions'
+			id_departement_test as 'Test departement Id.',
+			descriptions as 'Descriptions'
 		from t_Departement_tests
 			order by id_departement_test desc
 go
@@ -847,8 +845,8 @@ create procedure rechercher_id_departement_test
 	@id_departement_test
 	as
 		select top 20
-	    	id_departement_test as 'id_departement_tests',
-	    	descriptions as 'descriptions'
+	    	id_departement_test as 'Test departement Id.',
+	    	descriptions as 'Descriptions'
 	from t_interpretations_resultats
 		where
 			id_departement_tests like '%'+@id_departement_tests+'%'
@@ -888,8 +886,8 @@ go
 create procedure afficher_test_medicaux
 	as
 		select top 20
-			id_test_medical as 'id_test_medical',
-			descriptions as 'descriptions'
+			id_test_medical as 'Medical Test Id.',
+			descriptions as 'Descriptions'
 		from t_test_medicaux
 			order by id_test_medical desc
 go
@@ -897,8 +895,8 @@ create procedure rechercher_id_test_medical
 	@id_test_medical nvarchar(40),
 	as
 		select top 20
-			id_test_medical as 'id_test_medical',
-			descriptions as 'descriptions'
+			id_test_medical as 'Medical Test Id.',
+			descriptions as 'Descriptions'
 		from t_test_medicaux
 			where
 				id_test_medical '%'+@id_test_medical+'%'
@@ -927,15 +925,79 @@ create procedure supprimer_prix_test_medicaux
 			where id_test_medical like @id_test_medical
 go
 ----------------------------ici se termine la logique de la table t_prix_test_medicaux--------------
+
 create table t_procurement
 (
 	procurement_id nvarchar(50),
 	procurement_date date,
 	consumption_limit_date date,
 	expiration_date date,
-	product_id 
+	product_id int,
+	active_status boolean,
+	constraint pk_procurement primary key (procurement_id)
+);
+go
 
-)
+----------------------------ici commence la logique de la table t_prix_test_medicaux--------------
+
+create procedure afficher_procurement
+	as
+		select top 20
+			procurememt_id as 'Procurement Id.',
+			procurement_date as 'Procurement Date',
+			consumption_limit_date as 'Consumption Limit Date'
+			expiration_date as 'Expiration Date'
+			product_id as 'Product Id'
+		from t_procurement
+			order by procurememt_id desc;
+go
+
+create procedure rechercher_procurement
+	@procurememt_id nvarchar(40),
+	as
+		select top 20
+			procurememt_id as 'Procurement Id.',
+			procurement_date as 'Procurement Date',
+			consumption_limit_date as 'Consumption Limit Date'
+			expiration_date as 'Expiration Date'
+			product_id as 'Product Id'
+		from t_procurement
+			where
+				procurememt_id like '%'+@procurememt_id+'%'
+			order by procurememt_id desc;
+go
+
+create procedure enregistrer_procurement
+	@procurememt_id nvarchar(40),
+	@procurement_date date,
+	@consumption_limit_date date,
+	@expiration_date date,
+	@product_id int
+	as
+		merge into t_procurement
+			using (select @procurement_id as x_id) as x_source
+			on (x_source.x_id = t_procurement.procurememt_id)
+			when matched then
+				update set
+					procurememt_id = @procurememt_id,
+					procurement_date = @procurement_date,
+					consumption_limit_date = @consumption_limit_date,
+					expiration_date = @expiration_date,
+					product_id = @product_id
+					active_status = true
+			when not matched then
+				insert
+					(procurememt_id, procurement_date, consumption_limit_date, expiration_date, product_id, active_status)
+				values
+					(@procurememt_id, @procurement_date, @consumption_limit_date, @expiration_date, @product_id, @active_status);								 	
+go
+
+create procedure supprimer_procurement
+	@procurememt_id
+	as
+		delete from t_procurement
+			where procurememt_id like @procurememt_id;
+go
 
 ----------------------- TABLES -----------------------
 
