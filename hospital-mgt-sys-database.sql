@@ -341,24 +341,24 @@ create procedure rechercher_patient
 	@names nvarchar(100)
 	as
 		select top 20
-			id_patient as 'id_patient'
-			patient_type_id as 'patient_type_id',
-			names as 'names',
-			gender as 'gender',
-			birthday_date  as 'birthday_date',
-			nationality as 'nationality',
-			father_names as 'father_names',
-			mother_names as 'mother_names',
-			profession as 'profession',
-			adress as 'adress',
-			telephone as 'telephone',
-			reference_name 'reference_name',
-			reference_phone as 'reference',
-			attach_hospital as 'attach_hospital',
-			blood_group  as 'blood_group',
-			access_level as 'access_level',
-			company_id as 'company_id',
-			status boolean
+			id_patient as 'Patient Id',
+			patient_type_id as 'Patient Id Type',
+			names as 'Names',
+			gender as 'Gender',
+			birthday_date  as 'Birthday Date',
+			nationality as 'Nationality',
+			father_names as 'Father Names',
+			mother_names as 'Mother Names',
+			profession as 'Profession',
+			adress as 'Address',
+			telephone as 'Phone Number',
+			reference_name 'Reference Name',
+			reference_phone as 'Reference',
+			attach_hospital as 'Attached Hospital',
+			blood_group  as 'Blood Group',
+			access_level as 'Access Level',
+			company_id as 'Company Id',
+			active_status as 'Status'
 	from t_patient	
 		where
 			names like @names
@@ -381,7 +381,7 @@ create procedure enregistrer_patient
 	@attach_hospital nvarchar(50),
     @blood_group nvarchar(10),
 	@access_level nvarchar(50),
-	@company_id nvarchar(50)
+	@company_id nvarchar(50),
 	@status boolean
 	as
 		merge into t_patient
@@ -405,13 +405,12 @@ create procedure enregistrer_patient
 					blood_group=@blood_group,
 					access_level=@access_level,
 					company_id=@company_id
+					active_status=true
 			when not matched then
 				insert
-					(patient_type_id, names, gender, birthday_date, 
-					nationality, father_names, mother_names, profession, reference, reference_phone, attach_hospital, blood_group, access_level, company_id)
+					(patient_type_id, names, gender, birthday_date, nationality, father_names, mother_names, profession, reference, reference_phone, attach_hospital, blood_group, access_level, company_id, active_status)
 				values	
-					(@patient_type_id, @names, @gender, @birthday_date, 
-					@nationality, @father_names, @mother_names, @profession, @reference, @reference_phone, @attach_hospital, @blood_group, @access_level, @company_id)
+					(@patient_type_id, @names, @gender, @birthday_date, @nationality, @father_names, @mother_names, @profession, @reference, @reference_phone, @attach_hospital, @blood_group, @access_level, @company_id, true)
 go
 create procedure supprimer_patient
 	@id_patient int
@@ -433,8 +432,8 @@ go
 create procedure afficher_patient_type
 	as
 		select top 10
-			patient_type_id as 'patient_type_id',
-			descriptipons as 'descriptions'
+			patient_type_id as 'Patient Type Id.',
+			descriptipons as 'Descriptions'
 		from patient_type
 			order by patient_type_id desc
 go
@@ -442,8 +441,8 @@ create procedure rechercher_patient_type_id
 	@patient_type_id
 	as
 		select top 10
-			patient_type_id as 'patient_type_id',
-			descriptions as 'descriptions'	
+			patient_type_id as 'Patient Type Id',
+			descriptions as 'Descriptions'	
 		from patient_type
 			where
 				descriptions like '%'+descriptions+'%'
@@ -482,7 +481,7 @@ create table t_clinical_information
 	patient_id int,
 	other_information nvarchar(max),
 	access_level nvarchar(50),
-	company_id nvarchar(50)
+	company_id nvarchar(50),
 	constraint pk_clinical_info primary key (clinical_info_id)
 )
 go
@@ -490,28 +489,28 @@ go
 create procedure afficher_clinical_info
 	as
 		select top 20
-			clinical_info_id as 'clinical_info_id',
-			height  as 'height',
-			weights as 'weights',
-			imc as 'imc',
-			patient_id as 'patient_id',
-			other_information as 'other_information',
-			access_level as 'access_level',
-			company_id as 'company_id'
+			clinical_info_id as 'Clinical Info Id.',
+			height  as 'Height',
+			weights as 'Weight',
+			imc as 'IMC',
+			patient_id as 'Patient Id',
+			other_information as 'Other Informations',
+			access_level as 'Access Level',
+			company_id as 'Company Id'
 		from t_clinical_information
 			order by clinical_info_id desc
 go
 create procedure rechercher_clinical_info_id
 	as
 		select top 10
-			clinical_info_id as 'clinical_info_id',
-			height as 'heigth',
-			weights as 'weigths',
-			imc as 'imc',
-			patient_id as 'patient_id',
-			other_information as 'other_information',
-			access_level as 'access_level',
-			company_id as 'access_level'
+			clinical_info_id as 'Clinical Info Id.',
+			height as 'Heigth',
+			weights as 'Weigth',
+			imc as 'IMC',
+			patient_id as 'Patient Id',
+			other_information as 'Other Informations',
+			access_level as 'Access Level',
+			company_id as 'Company Id'
 		from t_clinical_information
 			where
 				patient_id like '%'+clinical_info_id+'%'
@@ -556,13 +555,13 @@ go
 create table t_checking_medical
 (
 	id_checking_medical int identity,
-	id_company nvarchar(50),
+	company_id nvarchar(50),
 	access_level nvarchar(40),
 	id_patient int,
 	id_departement_test nvarchar(50),
 	id_test_medical nvarchar(50),
 	date_checking date,
-	descriptions_checking nvarchar(max)
+	descriptions_checking nvarchar(max),
 	constraint pk_checking_medical primary key (id_checking_medical)
 )
 go
@@ -570,14 +569,14 @@ go
 create procedure afficher_id_checking_medical
 	as
 		select top 20
-			id_checking_medical as 'id_checking_medical',
-			id_company as 'id_company',
-			access_level as 'access_level',
-			id_patient as 'id_patient',
-			id_departement_test as 'id_departement-test',
-			id_test_medical as 'id_test_medical',
-			date_checking as 'date_checking',
-			descriptions_checking as 'descriptions_checking'
+			id_checking_medical as 'Id Medical Checking',
+			company_id as 'Company Id',
+			access_level as 'Access Level',
+			id_patient as 'Patient Id',
+			id_departement_test as 'Test Department',
+			id_test_medical as 'Medical Test Id',
+			date_checking as 'Checking Date',
+			descriptions_checking as 'Checking Description'
 		from t_checking_medical
 			order by id_checking_medical desc	
 go
@@ -585,14 +584,14 @@ create procedure rechercher_id_checking_medical
 	@id_patient
 	as
 		select top 20
-			id_checking_medical as 'id_checking_medical',
-			id_company as 'id_company',
-			access_level as 'access_level',
-			id_patient as 'id_patient',
-			id_departement_test as 'id_departement-test',
-			id_test_medical as 'id_test_medical',
-			date_checking as 'date_checking',
-			descriptions_checking as 'descriptions_checking'
+			id_checking_medical as 'Id Medical Checking',
+			company_id as 'Company Id',
+			access_level as 'Access Level',
+			id_patient as 'Patient Id',
+			id_departement_test as 'Test Department',
+			id_test_medical as 'Medical Test Id',
+			date_checking as 'Checking Date',
+			descriptions_checking as 'Checking Description'
 		from t_checking_medical
 			where 
 				id_patient like '%'+@id_patient+'%'
@@ -605,7 +604,7 @@ create procedure enregistrer_checking_medical
 	@id_patient int,
 	@id_departement_test nvarchar(50),
 	@id_test_medical nvarchar(50),
-	@date_checkin date,
+	@date_checking date,
 	@descriptions_checking nvarchar(max)
 		as 
 			merge into  t_checking_medical
@@ -618,12 +617,13 @@ create procedure enregistrer_checking_medical
 						id_patient=@id_patient,
 						id_departement=@id_departement,
 						id_test_medical=@id_test_medical,
+						date_checking=@date_checking,
 						descriptions=@descriptions		
 			    when not matched then
 					insert
-						(id_checking_medical, access_level, id_patient, id_departement, id_test_medical, descriptions)	
+						(id_checking_medical, access_level, id_patient, id_departement, id_test_medical, date_checking, descriptions)	
 					values
-						(@id_checking_medical, @access_level, @id_patient, @id_departement, @id_test_medical, @descriptions);
+						(@id_checking_medical, @access_level, @id_patient, @id_departement, @id_test_medical, @date_checking, @descriptions);
 go	
 create procedure supprimer_id_checking_medical	
 	@id_checking_medical
@@ -645,10 +645,10 @@ go
 create procedure afficher_resultat_checking
     as
 	select top 20
-		id_resultat_checking as 'id_resultat_checking',
-		id_checking_medical as 'id_checking_medical',
-		date_resultats as 'date_resultats',
-		descriptions as 'descriptions'
+		id_resultat_checking as 'Checking Results Id.',
+		id_checking_medical as 'Medical Checking Id.',
+		date_resultats as 'Rsults Date',
+		descriptions as 'Descriptions'
 	from t_resultat_checking
 		other_information by id_resultat_checking desc
 go
@@ -656,10 +656,10 @@ create procedure rechercher_resultat_checking
 	@id_checking_medical int
 	as
 		select top 20		
-			id_resultat_checking as 'id_resultat_checking',
-			id_checking_medical as 'id_checking',
-			date_resultats as 'date_resultats',
-			descriptions as 'descriptions'
+			id_resultat_checking as 'Checking Results Id.',
+			id_checking_medical as 'Medical Checking Id.',
+			date_resultats as 'Rsults Date',
+			descriptions as 'Descriptions'
 		from t_resultat_checking
 			where
 				id_resultat_checking like '%'+@id_resultat_checking+'%'
@@ -705,11 +705,11 @@ go
 create procedure afficher_interpretations
 	as
 	select top 20
-		id_interpretations as 'id_interpretations',
-		id_resultat_checking as 'id_resultat_checking',
-		descriptions as 'descriptions',
-		observations as 'observations',
-		decision_medical as 'decision_medical'
+		id_interpretations as 'Interpretations Id.',
+		id_resultat_checking as 'Checking Results Id.',
+		descriptions as 'Descriptions',
+		observations as 'Observations',
+		decision_medical as 'Medical Decision'
 	from t_interpretations_resultats
 		order by id_interpretations desc
 go
