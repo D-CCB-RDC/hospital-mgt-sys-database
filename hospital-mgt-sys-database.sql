@@ -16,7 +16,7 @@ create table t_company
 	email nvarchar(50),
 	telephone nvarchar(15),
 	legal_info nvarchar(max),
-	active_status boolean,
+	active_status bit,
 	constraint pk_company primary key (company_id)
 )
 go
@@ -33,7 +33,7 @@ create procedure afficher_t_company
 		legal_info as 'Legal Informations'
 	from t_company
 		order by company_id desc
-	where active_status = true;
+	where active_status = 1;
 go
 
 create procedure rechercher_company_name
@@ -62,7 +62,7 @@ create procedure enregistrer_company
 		@email nvarchar(50),
 		@telephone nvarchar(15),
 		@legal_info nvarchar(max),
-		@active_status boolean
+		@active_status bit
 	as
 		merge into t_company
 			using (select @company_id as x_id) as x_source
@@ -75,12 +75,12 @@ create procedure enregistrer_company
 					email = @email,
 					telephone = @telephone,
 					legal_info = @ legal_info,
-					active_status = true
+					active_status = 1
 			when not matched then
 				insert
 					(company_name, logo, adresse, telephone, legal_info, active_status)
 				values
-					(@company_name, @logo, @adresse, @telephone, @legal_info, true);
+					(@company_name, @logo, @adresse, @telephone, @legal_info, 1);
 go
 
 create procedure supprimer_company
@@ -91,7 +91,7 @@ create procedure supprimer_company
             on (x_source.x_id = t_company.company_id)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go
 
 -----------------------ici se termine la logique de la table t_company--------------------------
@@ -106,7 +106,7 @@ create table t_users (
 	email nvarchar(50),
 	telephone nvarchar(15),
 	company_id nvarchar(50),
-	active_status boolean,
+	active_status bit,
 	constraint pk_users primary key (user_id)
 );
 go
@@ -126,7 +126,7 @@ as
 		company_id  as 'Company Id',
 	from t_users
 		order by user_id desc
-	where active_status = true;
+	where active_status = 1;
 go
 
 create procedure rechercher_names
@@ -177,7 +177,7 @@ create procedure enregistrer_users
 			   insert
 			      (names, position_id, level_id, passwords, isactive, email, telephone, company_id, active_status)
 			   values
-			      (@names, @position_id, @level_id, @passwords, @isactive, @email, @telephone, @company_id, true);
+			      (@names, @position_id, @level_id, @passwords, @isactive, @email, @telephone, @company_id, 1);
 go
 
 create procedure supprimer_user
@@ -188,7 +188,7 @@ create procedure supprimer_user
             on (x_source.x_id = t_users.user_id)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go
 
 -------------------ici se termine la logique du table t_users-------------------		
@@ -197,7 +197,7 @@ create table t_position
 (
 	position_id nvarchar(40),
 	descriptions nvarchar(max),
-	active_status boolean,
+	active_status bit,
 	constraint pk_position primary key (position_id)
 );
 go
@@ -211,7 +211,7 @@ create procedure afficher_position
 			descriptions as 'Descriptions'
 		from t_position
 			order by position_id desc
-		where active_status = true;
+		where active_status = 1;
 go
 
 create procedure rechercher_position
@@ -240,7 +240,7 @@ create procedure enregistrer_position
 				insert
 					(descriptions, active_status)
 				values
-					(@descriptions, true);
+					(@descriptions, 1);
 go
 
 create procedure supprimer_position
@@ -251,7 +251,7 @@ create procedure supprimer_position
             on (x_source.x_id = t_position.position_id)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go			
 ----------------ici se termine la logique de la table t_position-----------------
 
@@ -259,7 +259,7 @@ create table t_level
 (
 	level_id nvarchar(40),
 	descriptions nvarchar(max),
-	active_status boolean,
+	active_status bit,
 	constraint pk_level primary key (level_id)
 )
 go
@@ -271,7 +271,7 @@ create procedure afficher_level_id
 			descriptions as 'Descriptions'
 		from t_level
 			order by level_id desc
-		where active_status = true;
+		where active_status = 1;
 go
 
 create procedure rechercher_level_id
@@ -300,7 +300,7 @@ create procedure enregistrer_level_id
 				insert 
 					(descriptions, active_status)
 				values
-					(@descriptions, true);
+					(@descriptions, 1);
 go
 
 create procedure supprimer_level
@@ -311,7 +311,7 @@ create procedure supprimer_level
             on (x_source.x_id = t_level.level_id)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go
 
 ---------------- Hospital Management System-Registration-----------------------------
@@ -335,7 +335,7 @@ create table t_patient
     blood_group nvarchar(10),
 	access_level nvarchar(50),
 	company_id nvarchar(50),
-	active_status boolean,
+	active_status bit,
 	constraint pk_patient primary key (id_patient)
 );
 go
@@ -364,7 +364,7 @@ create procedure afficher_patient
 		active_status as 'Status'
 	from  t_patient
 		order by id_patient desc
-	where active_status = true;
+	where active_status = 1;
 go
 
 create procedure rechercher_patient
@@ -413,7 +413,7 @@ create procedure enregistrer_patient
     @blood_group nvarchar(10),
 	@access_level nvarchar(50),
 	@company_id nvarchar(50),
-	@status boolean
+	@status bit
 	as
 		merge into t_patient
 			using (select @names x_id) as x_source
@@ -436,12 +436,12 @@ create procedure enregistrer_patient
 					blood_group=@blood_group,
 					access_level=@access_level,
 					company_id=@company_id
-					active_status=true
+					active_status=1
 			when not matched then
 				insert
 					(patient_type_id, names, gender, birthday_date, nationality, father_names, mother_names, profession, reference, reference_phone, attach_hospital, blood_group, access_level, company_id, active_status)
 				values	
-					(@patient_type_id, @names, @gender, @birthday_date, @nationality, @father_names, @mother_names, @profession, @reference, @reference_phone, @attach_hospital, @blood_group, @access_level, @company_id, true);
+					(@patient_type_id, @names, @gender, @birthday_date, @nationality, @father_names, @mother_names, @profession, @reference, @reference_phone, @attach_hospital, @blood_group, @access_level, @company_id, 1);
 go
 
 create procedure supprimer_patient
@@ -452,7 +452,7 @@ create procedure supprimer_patient
             on (x_source.x_id = t_patient.patient_id)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go				
 -------------------ici se termine la logique de la table t_patient----------------
 go
@@ -460,7 +460,7 @@ create table t_patient_type
 (
 	patient_type_id int identity,
 	descriptipons nvarchar(max),
-	status boolean,
+	status bit,
 	constraint pk_patient primary key(patient_type_id)
 )
 go
@@ -472,7 +472,7 @@ create procedure afficher_patient_type
 			descriptipons as 'Descriptions'
 		from patient_type
 			order by patient_type_id desc
-		where active_status = true;
+		where active_status = 1;
 go
 create procedure rechercher_patient_type_id
 	@descriptions
@@ -501,7 +501,7 @@ create procedure enregistrer_patient_type
 				insert
 					(descriptions, active_status)
 				values	
-					(@descriptions, true);
+					(@descriptions, 1);
 go			
 
 create procedure supprimer_patient_type
@@ -512,7 +512,7 @@ create procedure supprimer_patient_type
             on (x_source.x_id = t_patient_type.patient_type_id)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go
 -----------------------ici se termine la logique de la table patient_type---------------
 
@@ -526,7 +526,7 @@ create table t_clinical_information
 	other_information nvarchar(max),
 	access_level nvarchar(50),
 	company_id nvarchar(50),
-	active_status boolean,
+	active_status bit,
 	constraint pk_clinical_info primary key (clinical_info_id)
 );
 go
@@ -545,7 +545,7 @@ create procedure afficher_clinical_info
 			company_id as 'Company Id'
 		from t_clinical_information
 			order by clinical_info_id desc
-		where active_status = true;
+		where active_status = 1;
 go
 
 create procedure rechercher_clinical_info_id
@@ -588,12 +588,12 @@ create procedure enregistrer_clinical_info_id
 					other_information=@other_information,
 					access_level=@access_level,
 					company_id=@company_id,
-					active_status = true
+					active_status = 1
 			when matched then
 				insert
 					(height, weights , imc, patient_id, other_information, access_level, company_id, active_status)
 				values
-					(@height, @weights , @imc, @patient_id, @other_information, @access_level, @company_id, true);
+					(@height, @weights , @imc, @patient_id, @other_information, @access_level, @company_id, 1);
 go
 
 create procedure supprimer_clinical_info
@@ -604,7 +604,7 @@ create procedure supprimer_clinical_info
             on (x_source.x_id = t_clinical_information.clinical_info_id)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go
 ------------------------ici se termine la logique de la table t_clinical_information------------------------------------
 			
@@ -618,7 +618,7 @@ create table t_checking_medical
 	id_test_medical nvarchar(50),
 	date_checking date,
 	descriptions_checking nvarchar(max),
-	active_status boolean,
+	active_status bit,
 	constraint pk_checking_medical primary key (id_checking_medical)
 );
 go
@@ -637,7 +637,7 @@ create procedure afficher_id_checking_medical
 			descriptions_checking as 'Checking Description'
 		from t_checking_medical
 			order by id_checking_medical desc
-		where active_status = true;
+		where active_status = 1;
 go
 
 create procedure rechercher_id_checking_medical
@@ -680,12 +680,12 @@ create procedure enregistrer_checking_medical
 						id_test_medical=@id_test_medical,
 						date_checking=@date_checking,
 						descriptions=@descriptions,
-						active_status=true	
+						active_status=1	
 			    when not matched then
 					insert
 						(id_checking_medical, access_level, id_patient, id_departement, id_test_medical, date_checking, descriptions, active_status)	
 					values
-						(@id_checking_medical, @access_level, @id_patient, @id_departement, @id_test_medical, @date_checking, @descriptions, true);
+						(@id_checking_medical, @access_level, @id_patient, @id_departement, @id_test_medical, @date_checking, @descriptions, 1);
 go
 
 create procedure supprimer_checking_medical
@@ -696,7 +696,7 @@ create procedure supprimer_checking_medical
             on (x_source.x_id = t_checking_medical.id_checking_medical)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go									
 -----------------ici se termine la logique de la table t_checking_medical----------------
 create table t_resultat_checking
@@ -705,7 +705,7 @@ create table t_resultat_checking
 	id_checking_medical int,
 	date_resultats date,
 	descriptions nvarchar(max),
-	active_status boolean,
+	active_status bit,
 	constraint pk_resultat_checking primary key(id_resultat_checking)
 )
 go
@@ -719,7 +719,7 @@ create procedure afficher_resultat_checking
 		descriptions as 'Descriptions'
 	from t_resultat_checking
 		other_information by id_resultat_checking desc
-	where active_status = true;
+	where active_status = 1;
 go
 
 create procedure rechercher_resultat_checking
@@ -750,12 +750,12 @@ create procedure enregistrer_resultat_checking
 					id_checking_medical=@id_checking_medical,
 					date_resultats=@date_resultats,
 					descriptions=@descriptions,
-					active_status=true
+					active_status=1
 			when not matched then
 				insert
 					(id_checking_medical, date_resultats, descriptions, active_status)
 				values
-					(@id_checking_medical, @date_resultats, @descriptions, true);
+					(@id_checking_medical, @date_resultats, @descriptions, 1);
 go
 
 create procedure supprimer_resultat_checking
@@ -766,7 +766,7 @@ create procedure supprimer_resultat_checking
             on (x_source.x_id = t_resultat_checking.id_resultat_checking)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go
 ----------------ici se termine la logique de la table t_resultat_checking-----------------
 
@@ -777,7 +777,7 @@ create table t_interpretations_resultats
 	descriptions nvarchar(max),
 	observations nvarchar(max),
 	decision_medical nvarchar(100),
-	active_status boolean,
+	active_status bit,
 	constraint pk_interpretations_resultats primary key (id_interpretations)
 )
 go
@@ -791,7 +791,7 @@ create procedure afficher_interpretations
 		decision_medical as 'Medical Decision'
 	from t_interpretations_resultats
 		order by id_interpretations desc
-	where id_interpretations = true;
+	where id_interpretations = 1;
 go
 
 create procedure rechercher_interpretations
@@ -826,12 +826,12 @@ create procedure enregistrer_interpretations_resultats
 					descriptions=@descriptions,
 					observations=@observations,
 					decision_medical=@decision_medical,
-					active_status=true
+					active_status=1
 			when not matched  then
 				insert
 					(id_resultat_checking, descriptions, observations, decision_medical, active_status)
 				values
-					(@id_resultat_checking, @descriptions, @observations, @decision_medical, true)
+					(@id_resultat_checking, @descriptions, @observations, @decision_medical, 1)
 go
 
 create procedure supprimer_interpretation_medical
@@ -842,7 +842,7 @@ create procedure supprimer_interpretation_medical
             on (x_source.x_id = t_interpretations_resultats.id_interpretations)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go
 -------------------ici se termine la logique de la table t_interpretations_resultats------------------------------
 go
@@ -854,7 +854,7 @@ create table t_prix_tests_medicaux
 	prix_usd money,
 	prix_fc money,
 	date_enregistrement date,
-	active_status boolean,
+	active_status bit,
 	constraint pk_prix_test_medicaux primary key (id_prix_test)
 );
 go
@@ -871,7 +871,7 @@ create procedure afficher_prix_tests_medicaux
 			date_enregistrement as 'Register Date'
 		from t_prix_tests_medicaux
 			order by id_prix_test desc
-		where active_status = true;
+		where active_status = 1;
 go
 
 create procedure rechercher_prix_tests_medicaux			
@@ -908,7 +908,7 @@ create procedure enregistrer_prix_tests_medicaux
 				(id_checking_medical, id_test_medical, prix_usd, prix_fc, active_status, date_enregistrement)
 			values
 				
-				(@id_checking_medical, @id_test_medical, @prix_usd, @prix_fc, true, @date_enregistrement);
+				(@id_checking_medical, @id_test_medical, @prix_usd, @prix_fc, 1, @date_enregistrement);
 go
 
 create procedure supprimer_prix_test_medicaux
@@ -919,7 +919,7 @@ create procedure supprimer_prix_test_medicaux
             on (x_source.x_id = t_prix_test_medicaux.id_prix_test)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go
 ----------------------ici se termine la logique de la table t_prix_test_medicaux--------------------------
 
@@ -927,7 +927,7 @@ create table t_departement_tests
 (
 	id_departement_test nvarchar(50),
 	descriptions nvarchar(max),
-	active_status boolean,
+	active_status bit,
 	constraint pk_Departement_tests primary key (id_departement_test)
 )
 ---------------------ici commence la logique de table t_departement_tests-----------------------------------
@@ -938,7 +938,7 @@ create procedure afficher_departement_tests
 			descriptions as 'Descriptions'
 		from t_Departement_tests
 			order by id_departement_test desc
-		where active_status = true;
+		where active_status = 1;
 go
 
 create procedure rechercher_id_departement_test	
@@ -967,7 +967,7 @@ create procedure enregistrer_id_departement_test
 				insert
 					(descriptions, active_status)
 				values
-					(@descriptions, true);
+					(@descriptions, 1);
 go
 
 create procedure supprimer_departement_tests
@@ -978,7 +978,7 @@ create procedure supprimer_departement_tests
             on (x_source.x_id = t_departement_tests.id_departement_test)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go
 
 ------------------------ici se termine la logique de la table t_Departement_tests----------------------------	
@@ -986,7 +986,7 @@ create table t_test_medicaux
 (
 	id_test_medical nvarchar(40),
 	descriptions nvarchar(max),
-	active_status boolean,
+	active_status bit,
 	constraint pk_test_medicaux primary key (id_test_medical)
 );
 go
@@ -998,7 +998,7 @@ create procedure afficher_test_medicaux
 			descriptions as 'Descriptions'
 		from t_test_medicaux
 			order by id_test_medical desc
-		where active_status = true;
+		where active_status = 1;
 go
 
 create procedure rechercher_id_test_medical
@@ -1027,7 +1027,7 @@ create procedure enregistrer_test_medicaux
 				insert
 					(descriptions, active_status)
 				values
-					(@descriptions, true);											 	
+					(@descriptions, 1);											 	
 go
 
 create procedure supprimer_test_medicaux
@@ -1038,7 +1038,7 @@ create procedure supprimer_test_medicaux
             on (x_source.x_id = t_test_medicaux.id_test_medical)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go
 ----------------------------ici se termine la logique de la table t_prix_test_medicaux--------------
 
@@ -1061,7 +1061,7 @@ create table procurement (
     purchase_unit_price money,
     sale_unit_price money,
     fabrication_date date,
-    active_status boolean,
+    active_status bit,
     constraint pk_procurement primary key (procurement_id)
 );
 
@@ -1069,28 +1069,28 @@ create table product (
     product_id int identity,
     designation nvarchar(max),
     qty_alert int,
-	active_status boolean,
+	active_status bit,
     constraint pk_products primary key (product_id)
 );
 
 create table shape (
     shape_id int identity,
     designation nvarchar(max),
-	active_status boolean,
+	active_status bit,
     constraint pk_shape primary key (shape_id)
 );
 
 create table category (
     category_id int identity,
     designation nvarchar(max),
-	active_status boolean,
+	active_status bit,
     constraint pk_designation primary key (category_id)
 );
 
 create table container (
     container_id int identity,
     designation nvarchar(max),
-	active_status boolean,
+	active_status bit,
     constraint pk_container primary key (container_id)
 );
 
@@ -1100,7 +1100,7 @@ create table supplier (
     phone nvarchar(15),
     addresses nvarchar(max),
     email nvarchar(max),
-	active_status boolean,
+	active_status bit,
     constraint pk_supplier primary key (supplier_id)
 );
 
@@ -1113,7 +1113,7 @@ create table order_details (
     total_quantity int,
     access_level nvarchar(50),
     company_id int,
-	active_status boolean,
+	active_status bit,
     constraint pk_order_details primary key (order_details_id)
 );
 
@@ -1124,7 +1124,7 @@ create table order (
     total_quantity date,
     access_level nvarchar(50),
     comapny_id int,
-	active_status boolean,
+	active_status bit,
     constraint pk_order primary key (order_id)
 );
 
@@ -1190,7 +1190,7 @@ create procedure afficher_procurement
         fabrication_date as 'Fabrication Date'
 	from procurement
 		order by procurement_id desc
-	where active_status = true;
+	where active_status = 1;
 go
 
 create procedure afficher_product
@@ -1201,7 +1201,7 @@ create procedure afficher_product
         qty_alert as 'Quantity Alert'
 	from product
 		order by product_id desc
-	where active_status = true;
+	where active_status = 1;
 go
 
 create procedure afficher_shape
@@ -1211,7 +1211,7 @@ create procedure afficher_shape
         designation as 'Designation'
 	from shape
 		order by shape_id desc
-	where active_status = true;
+	where active_status = 1;
 go
 
 create procedure afficher_category
@@ -1221,7 +1221,7 @@ create procedure afficher_category
         designation as 'Designation'
 	from category
 		order by category_id desc
-	where active_status = true;
+	where active_status = 1;
 go
 
 create procedure afficher_container
@@ -1231,7 +1231,7 @@ create procedure afficher_container
         designation as 'Designation'
 	from container
 		order by container_id desc
-	where active_status = true;
+	where active_status = 1;
 go
 
 create procedure afficher_supplier
@@ -1244,7 +1244,7 @@ create procedure afficher_supplier
         email as 'Email Addrerss'
 	from supplier
 		order by supplier_id desc
-	where active_status = true;
+	where active_status = 1;
 go
 
 create procedure afficher_order_details
@@ -1260,7 +1260,7 @@ create procedure afficher_order_details
         company_id as 'Company Id.'
 	from order_details
 		order by order_details_id desc
-	where active_status = true;
+	where active_status = 1;
 go
 
 create procedure afficher_order
@@ -1274,7 +1274,7 @@ create procedure afficher_order
         company_id as 'Company Id.'
 	from order_details
 		order by order_details_id desc
-	where active_status = true;
+	where active_status = 1;
 go
 
 ----------------------- RESEARCH PROCEDURES -----------------------
@@ -1437,7 +1437,7 @@ create procedure enregistrer_procurement
     @purchase_unit_price money,
     @sale_unit_price money,
     @fabrication_date date,
-    @active_status boolean
+    @active_status bit
 	as
 		merge into procurement
 			using (select @procurement_id as x_id) as x_source
@@ -1464,7 +1464,7 @@ create procedure enregistrer_procurement
 				insert
 					(procurement_id, procurement_date, consumption_limit_date, expiration_date, product_id, shape_id, category_id, container_id, quantity, supplier_id, total_quantity, access_level, company_id, purchase_unit_price, sale_unit_price, fabrication_date, active_status)
 				values
-					(@procurement_id, @procurement_date, @consumption_limit_date, @expiration_date, @product_id, @shape_id, @category_id, @container_id, @quantity, @supplier_id, @total_quantity, @access_level, @company_id, @purchase_unit_price, @sale_unit_price, @fabrication_date, true);
+					(@procurement_id, @procurement_date, @consumption_limit_date, @expiration_date, @product_id, @shape_id, @category_id, @container_id, @quantity, @supplier_id, @total_quantity, @access_level, @company_id, @purchase_unit_price, @sale_unit_price, @fabrication_date, 1);
 go
 
 create procedure enregistrer_product
@@ -1484,7 +1484,7 @@ create procedure enregistrer_product
 				insert
 					(product_id, designation, qty_alert, active_status)
 				values
-					(@product_id, @designation, @qty_alert, true);
+					(@product_id, @designation, @qty_alert, 1);
 go
 
 create procedure enregistrer_shape
@@ -1502,7 +1502,7 @@ create procedure enregistrer_shape
 				insert
 					(shape_id, designation, active_status)
 				values
-					(@shape_id, @designation, true);
+					(@shape_id, @designation, 1);
 go
 
 create procedure enregistrer_category
@@ -1520,7 +1520,7 @@ create procedure enregistrer_category
 				insert
 					(category_id, designation, active_status)
 				values
-					(@category_id, @designation, true);
+					(@category_id, @designation, 1);
 go
 
 create procedure enregistrer_container
@@ -1538,7 +1538,7 @@ create procedure enregistrer_container
 				insert
 					(container_id, designation, active_status, active_status)
 				values
-					(@container_id, @designation, true);
+					(@container_id, @designation, 1);
 go
 
 create procedure enregistrer_supplier
@@ -1562,7 +1562,7 @@ create procedure enregistrer_supplier
 				insert
 					(supplier_id, names, phone, addresses, email, active_status) 
 				into
-					(@supplier_id, @names, @phone, @addresses, @email, true);
+					(@supplier_id, @names, @phone, @addresses, @email, 1);
 go
 
 create procedure enregistrer_order_details
@@ -1592,7 +1592,7 @@ create procedure enregistrer_order_details
 				insert
 					(order_date, order_id, order_id, procurement_id, order_date, quantity, total_quantity, access_level, comapny_id, active_status)
 				values
-					(@order_date, @order_id, @order_id, @procurement_id, @order_date, @quantity, @total_quantity, @access_level, @comapny_id, true);
+					(@order_date, @order_id, @order_id, @procurement_id, @order_date, @quantity, @total_quantity, @access_level, @comapny_id, 1);
 go
 
 create procedure enregistrer_order
@@ -1618,7 +1618,7 @@ create procedure enregistrer_order
 				insert
 					(order_id, order_date, quantity, total_quantity, access_level, company_id, active_status)
 				values
-					(@order_id, @order_date, @quantity, @total_quantity, @access_level, @company_id, true);
+					(@order_id, @order_date, @quantity, @total_quantity, @access_level, @company_id, 1);
 go
 				
 ----------------------- DELETE PROCEDURES -----------------------
@@ -1631,7 +1631,7 @@ create procedure supprimer_procurement
             on (x_source.x_id = procurement.procurement_id)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go
 
 create procedure supprimer_order_details
@@ -1642,7 +1642,7 @@ create procedure supprimer_order_details
             on (x_source.x_id = order_details.order_details_id)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go
 
 create procedure supprimer_order
@@ -1653,7 +1653,7 @@ create procedure supprimer_order
             on (x_source.x_id = order.order_id)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go
 
 create procedure supprimer_product
@@ -1664,7 +1664,7 @@ create procedure supprimer_product
             on (x_source.x_id = product.product_id)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go
 
 create procedure supprimer_shape
@@ -1675,7 +1675,7 @@ create procedure supprimer_shape
             on (x_source.x_id = shape.shape)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go
 
 create procedure supprimer_category
@@ -1686,7 +1686,7 @@ create procedure supprimer_category
             on (x_source.x_id = category.category_id)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go
 
 create procedure supprimer_container
@@ -1697,7 +1697,7 @@ create procedure supprimer_container
             on (x_source.x_id = container.container_id)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go
 
 create procedure supprimer_supplier
@@ -1708,5 +1708,5 @@ create procedure supprimer_supplier
             on (x_source.x_id = supplier.supplier_id)
             when matched then
                 update set
-			        active_status = false;
+			        active_status = 0;
 go
