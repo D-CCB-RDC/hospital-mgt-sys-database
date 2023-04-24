@@ -18,7 +18,7 @@ create table t_company
 	legal_info nvarchar(max),
 	active_status bit,
 	constraint pk_company primary key (company_id)
-)
+);
 go
 ---------------------ici commence la logique de la table t_company---------------------------
 create procedure afficher_t_company
@@ -172,7 +172,8 @@ create procedure enregistrer_users
 					isactive=@isactive,
 					email=@email,
 					telephone=@telephone,
-					company_id=@company_id
+					company_id=@company_id,
+					active_status = 1;
 			when not matched then
 			   insert
 			      (names, position_id, level_id, passwords, isactive, email, telephone, company_id, active_status)
@@ -219,7 +220,8 @@ create procedure rechercher_position
 	as
 		select top 10
 			position_id as 'Position Id.',
-			descriptions as 'Descriptipons'
+			descriptions as 'Descriptipons',
+			active_status as 'Active Status'
 	from t_position
 		where
 			descriptions like '%'+@descriptions+'%'
@@ -235,7 +237,8 @@ create procedure enregistrer_position
 			on(x_source.x_id=t_position.position_id)
 			when matched then
 				update set
-					descriptions = @descriptions
+					descriptions = @descriptions,
+					active_status = 1
 			when not matched then
 				insert
 					(descriptions, active_status)
@@ -261,7 +264,7 @@ create table t_level
 	descriptions nvarchar(max),
 	active_status bit,
 	constraint pk_level primary key (level_id)
-)
+);
 go
 -----------------ici commence la logique de la table t_level----------------------
 create procedure afficher_level_id
@@ -279,7 +282,8 @@ create procedure rechercher_level_id
 	as
 		select top 20
 			level_id as 'Level Id',
-			descriptions as 'Descriptions'
+			descriptions as 'Descriptions',
+			active_status as 'Active Status'
 		from t_level
 			where
 				descriptions like '%'+@descriptions+'%'
@@ -295,7 +299,8 @@ create procedure enregistrer_level_id
 			on(x_source.x_id=t_level.level_id)
 			when matched then
 				update set
-					descriptions = @descriptions
+					descriptions = @descriptions,
+					active_status = 1
 			when not matched then
 				insert 
 					(descriptions, active_status)
@@ -360,8 +365,7 @@ create procedure afficher_patient
 		attach_hospital as 'Attached Hospital',
 		blood_group  as 'Blood Group',
 		access_level as 'Access Level',
-		company_id as 'Company Id',
-		active_status as 'Status'
+		company_id as 'Company Id'
 	from  t_patient
 		order by id_patient desc
 	where active_status = 1;
@@ -388,7 +392,7 @@ create procedure rechercher_patient
 			blood_group  as 'Blood Group',
 			access_level as 'Access Level',
 			company_id as 'Company Id',
-			active_status as 'Status'
+			active_status as 'Active Status'
 	from t_patient	
 		where
 			names like @names
@@ -435,7 +439,7 @@ create procedure enregistrer_patient
 					attach_hospital=@attach_hospital,
 					blood_group=@blood_group,
 					access_level=@access_level,
-					company_id=@company_id
+					company_id=@company_id,
 					active_status=1
 			when not matched then
 				insert
@@ -455,14 +459,14 @@ create procedure supprimer_patient
 			        active_status = 0;
 go				
 -------------------ici se termine la logique de la table t_patient----------------
-go
+
 create table t_patient_type
 (
 	patient_type_id int identity,
 	descriptipons nvarchar(max),
 	status bit,
 	constraint pk_patient primary key(patient_type_id)
-)
+);
 go
 -----------------------ici commence la logique de la table patient_type-----------------
 create procedure afficher_patient_type
@@ -474,6 +478,7 @@ create procedure afficher_patient_type
 			order by patient_type_id desc
 		where active_status = 1;
 go
+
 create procedure rechercher_patient_type_id
 	@descriptions
 	as
@@ -496,7 +501,8 @@ create procedure enregistrer_patient_type
 			on(x_source.x_id=t_patient_type.patient_type_id)
 			when matched then
 				update set
-					descriptions = @descriptions
+					descriptions = @descriptions,
+					active_status = 1
 			when not matched then
 				insert
 					(descriptions, active_status)
@@ -651,7 +657,8 @@ create procedure rechercher_id_checking_medical
 			id_departement_test as 'Test Department',
 			id_test_medical as 'Medical Test Id',
 			date_checking as 'Checking Date',
-			descriptions_checking as 'Checking Description'
+			descriptions_checking as 'Checking Description',
+			active_status as 'Active Status'
 		from t_checking_medical
 			where 
 				id_patient like '%'+@id_patient+'%'
@@ -707,7 +714,7 @@ create table t_resultat_checking
 	descriptions nvarchar(max),
 	active_status bit,
 	constraint pk_resultat_checking primary key(id_resultat_checking)
-)
+);
 go
 ----------------ici commence la logique de la  table t_resultat_checking------------------
 create procedure afficher_resultat_checking
@@ -734,8 +741,9 @@ create procedure rechercher_resultat_checking
 		from t_resultat_checking
 			where
 				id_resultat_checking like '%'+@id_resultat_checking+'%'
-			order by id_resultat_checking desc
+			order by id_resultat_checking desc;
 go
+
 create procedure enregistrer_resultat_checking
 	@id_resultat_checking int,
 	@id_checking_medical int,
@@ -831,7 +839,7 @@ create procedure enregistrer_interpretations_resultats
 				insert
 					(id_resultat_checking, descriptions, observations, decision_medical, active_status)
 				values
-					(@id_resultat_checking, @descriptions, @observations, @decision_medical, 1)
+					(@id_resultat_checking, @descriptions, @observations, @decision_medical, 1);
 go
 
 create procedure supprimer_interpretation_medical
@@ -883,7 +891,6 @@ create procedure rechercher_prix_tests_medicaux
 			id_test_medical as 'Medical Test Id.',
 			prix_usd as 'Price USD',
 			prix_fc as 'Price UCF',
-			active_status as 'Active Status',
 			date_enregistrement as 'Register Date',
 			active_status as 'Active Status'
 		from t_prix_tests_medicaux
@@ -903,6 +910,14 @@ create procedure enregistrer_prix_tests_medicaux
 		merge into t_prix_tests_medicaux
 			using(select @id_prix_test as x_id) as x_source
 			on(x_source.x_id=t_prix_tests_medicaux.id_prix_test)
+		when matched then
+			update set
+				company_id = @company_id,
+				id_test_medical = @id_test_medical,
+				prix_usd = @prix_usd,
+				prix_fc = @prix_fc,
+				date_enregistrement = @date_enregistrement,
+				active_status = 1;
 		when not matched then
 			insert
 				(id_checking_medical, id_test_medical, prix_usd, prix_fc, active_status, date_enregistrement)
@@ -953,6 +968,7 @@ create procedure rechercher_id_departement_test
 			id_departement_test like '%'+@id_departement_test+'%'
 		order by id_departement_test;
 go
+
 create procedure enregistrer_id_departement_test
 	@id_departement_test nvarchar(50),
 	@descriptions	nvarchar(max)
