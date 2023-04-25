@@ -220,7 +220,7 @@ create procedure rechercher_position
 	as
 		select top 10
 			position_id as 'Position Id.',
-			descriptions as 'Descriptipons',
+			descriptions as 'Descriptions',
 			active_status as 'Active Status'
 	from t_position
 		where
