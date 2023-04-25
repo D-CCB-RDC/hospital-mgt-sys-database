@@ -278,7 +278,7 @@ create procedure afficher_level_id
 go
 
 create procedure rechercher_level_id
-	@descriptipons
+	@descriptions
 	as
 		select top 20
 			level_id as 'Level Id',
@@ -463,7 +463,7 @@ go
 create table t_patient_type
 (
 	patient_type_id int identity,
-	descriptipons nvarchar(max),
+	descriptions nvarchar(max),
 	status bit,
 	constraint pk_patient primary key(patient_type_id)
 );
@@ -473,7 +473,7 @@ create procedure afficher_patient_type
 	as
 		select top 10
 			patient_type_id as 'Patient Type Id.',
-			descriptipons as 'Descriptions'
+			descriptions as 'Descriptions'
 		from patient_type
 			order by patient_type_id desc
 		where active_status = 1;
